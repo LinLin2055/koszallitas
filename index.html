@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Szihalom Kőszállítások</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@112,600;112,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: a weighbridge readout on top (delivered to date vs order), the daily rhythm below it,
+   then the record itself — days, documents, open questions — as tabs. */
+:root{
+  --bg:#ECEFEA;        /* limestone dust */
+  --surface:#FAFBF8;
+  --sunk:#E2E6E0;
+  --ink:#1C2326;       /* andesite */
+  --muted:#5B666A;
+  --faint:#8A9497;
+  --rule:#D0D6CF;
+  --accent:#17385D;    /* Sky Tech navy */
+  --accent-soft:#D6E0EC;
+  --bar:#2B5C8C;
+  --warn:#8A5A00; --warn-bg:#FBEFD2;
+  --crit:#A12B22; --crit-bg:#F8DEDA;
+  --ok:#2C6B44;   --ok-bg:#DDEFE2;
+  --shadow:0 1px 2px rgba(28,35,38,.06),0 4px 16px rgba(28,35,38,.06);
+  --display:'Archivo','Arial Narrow',Arial,sans-serif;
+  --body:'IBM Plex Sans','Segoe UI',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111517;--surface:#192024;--sunk:#0D1012;--ink:#E4E9E6;--muted:#9AA6A9;--faint:#6F7A7D;--rule:#2C363B;
+  --accent:#8DB4DE;--accent-soft:#1F3248;--bar:#6E9CCB;--warn:#F0C66B;--warn-bg:#3A2E12;--crit:#F19C92;--crit-bg:#3E1C19;--ok:#8FD0A5;--ok-bg:#16301F;
+  --shadow:0 1px 2px rgba(0,0,0,.3);color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111517;--surface:#192024;--sunk:#0D1012;--ink:#E4E9E6;--muted:#9AA6A9;--faint:#6F7A7D;--rule:#2C363B;
+  --accent:#8DB4DE;--accent-soft:#1F3248;--bar:#6E9CCB;--warn:#F0C66B;--warn-bg:#3A2E12;--crit:#F19C92;--crit-bg:#3E1C19;--ok:#8FD0A5;--ok-bg:#16301F;
+  --shadow:0 1px 2px rgba(0,0,0,.3);color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+img{max-width:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--body);margin:0}
+.wrap{max-width:1080px;margin:0 auto;padding-inline:20px;padding-block:20px 64px}
+@media (max-width:520px){.wrap{padding-inline:16px}}
+h1,h2,h3{font-family:var(--display);font-stretch:112%;margin:0;text-wrap:balance;letter-spacing:-.01em}
+.mono,.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.eyebrow{font:600 11px/1 var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+
+/* top */
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.top h1{font-size:clamp(26px,4.4vw,38px);font-weight:800;line-height:1.05}
+.top .sub{color:var(--muted);font-size:13px;margin-top:6px}
+.top-r{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.stamp{font:500 12px/1 var(--mono);color:var(--muted);background:var(--surface);border:1px solid var(--rule);border-radius:999px;padding:7px 11px}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:999px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:none;padding:6px 11px;font-size:12px;font-weight:600;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--surface)}
+
+/* readout */
+.readout{background:var(--surface);border:1px solid var(--rule);border-radius:16px;box-shadow:var(--shadow);padding:22px;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:28px}
+@media (max-width:760px){.readout{grid-template-columns:1fr;gap:20px;padding:18px}}
+.big{font:800 clamp(48px,9vw,84px)/.95 var(--display);font-stretch:112%;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.big small{font-size:.38em;font-weight:600;margin-left:.15em;color:var(--muted);letter-spacing:0}
+.big-cap{color:var(--muted);margin-top:8px}
+.order{display:flex;flex-direction:column;gap:10px;justify-content:center}
+.order-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.order-head b{font:600 22px/1 var(--mono)}
+.order-head span{color:var(--muted);font-size:13px}
+.gauge{position:relative;height:18px;background:var(--sunk);border-radius:6px;overflow:hidden}
+.gauge i{position:absolute;inset:0 auto 0 0;background:var(--accent);border-radius:6px 2px 2px 6px}
+.gauge u{position:absolute;top:0;bottom:0;width:1px;background:var(--rule);opacity:.9}
+.gauge-scale{display:flex;justify-content:space-between;font:500 11px/1 var(--mono);color:var(--faint)}
+.facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:12px;overflow:hidden;margin-top:6px}
+@media (max-width:520px){.facts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.fact{background:var(--surface);padding:12px 14px}
+.fact b{display:block;font:600 20px/1.1 var(--mono);font-variant-numeric:tabular-nums}
+.fact span{font-size:12px;color:var(--muted)}
+
+/* row of cards under the readout */
+.row2{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px;margin-top:16px}
+@media (max-width:860px){.row2{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--rule);border-radius:14px;padding:18px;min-width:0}
+.panel h2{font-size:17px;font-weight:600;margin-bottom:12px}
+.chart{position:relative}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.chart .tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);font-size:12px;line-height:1.35;padding:7px 9px;border-radius:8px;white-space:nowrap;transform:translate(-50%,-100%);margin-top:-8px}
+.chart .tip b{font-family:var(--mono)}
+.mix{display:flex;flex-direction:column;gap:12px}
+.mix-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:baseline}
+.mix-row .lbl{font-weight:500}
+.mix-row .val{font:500 13px/1 var(--mono);color:var(--muted)}
+.mix-row .track{grid-column:1/-1;height:8px;background:var(--sunk);border-radius:4px;overflow:hidden}
+.mix-row .track i{display:block;height:100%;background:var(--bar);border-radius:4px}
+.mix-note{font-size:12px;color:var(--muted);border-top:1px solid var(--rule);padding-top:10px}
+
+/* tabs */
+.tabs{display:flex;gap:4px;margin:28px 0 14px;border-bottom:1px solid var(--rule);overflow-x:auto}
+.tabs button{border:0;background:none;padding:10px 14px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.count{display:inline-block;min-width:20px;padding:1px 6px;margin-left:6px;border-radius:999px;font:600 11px/16px var(--mono);background:var(--sunk);color:var(--muted);text-align:center}
+.count.crit{background:var(--crit-bg);color:var(--crit)}
+
+/* days */
+.day{background:var(--surface);border:1px solid var(--rule);border-radius:14px;margin-bottom:10px;overflow:hidden}
+.day>summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center;padding:14px 18px}
+.day>summary::-webkit-details-marker{display:none}
+.day-date{font:700 18px/1 var(--display);font-stretch:112%}
+.day-date small{display:block;font:500 12px/1.4 var(--body);color:var(--muted);margin-top:3px}
+.day-meta{display:flex;gap:6px;flex-wrap:wrap;min-width:0}
+.day-t{text-align:right}
+.day-t b{font:600 20px/1 var(--mono)}
+.day-t span{display:block;font-size:12px;color:var(--muted);margin-top:3px}
+.chev{transition:transform .15s;color:var(--faint)}
+.day[open] .chev{transform:rotate(90deg)}
+.day-body{border-top:1px solid var(--rule);padding:14px 18px 18px;display:flex;flex-direction:column;gap:16px}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:3px 9px;border-radius:999px;background:var(--sunk);color:var(--muted);white-space:nowrap}
+.pill.warn{background:var(--warn-bg);color:var(--warn)}
+.pill.crit{background:var(--crit-bg);color:var(--crit)}
+.pill.ok{background:var(--ok-bg);color:var(--ok)}
+.loads{display:flex;flex-direction:column;gap:8px}
+.load{display:grid;grid-template-columns:58px minmax(0,1fr) auto;gap:4px 14px;align-items:center;padding:10px 12px;border:1px solid var(--rule);border-radius:10px;background:var(--bg)}
+.load .tm{font:600 15px/1 var(--mono)}
+.load .who{min-width:0}
+.load .who b{font-weight:600}
+.load .who div{font-size:12.5px;color:var(--muted);overflow-wrap:anywhere}
+.load .net{text-align:right;font:600 18px/1 var(--mono)}
+.load .net small{display:block;font:400 11px/1.4 var(--body);color:var(--muted)}
+.load .thumbs{grid-column:2/-1}
+.load .rmk{grid-column:2/-1;font-size:12.5px;color:var(--warn)}
+@media (max-width:520px){.load{grid-template-columns:44px minmax(0,1fr);padding:10px}.load .net{grid-column:2;text-align:left;display:flex;gap:8px;align-items:baseline}.load .net small{display:inline}.load .rmk,.load .thumbs-wrap{grid-column:1/-1!important}}
+.thumbs{display:flex;gap:6px;flex-wrap:wrap}
+.thumb{width:64px;height:64px;border-radius:8px;border:1px solid var(--rule);background:var(--sunk);padding:0;overflow:hidden;position:relative}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb:hover{border-color:var(--accent)}
+.sub-h{font:600 11px/1 var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.route{display:flex;flex-wrap:wrap;gap:4px;align-items:center;font-size:12.5px}
+.stop{background:var(--bg);border:1px solid var(--rule);border-radius:6px;padding:3px 7px;white-space:nowrap}
+.stop b{font-weight:600}
+.stop .mono{color:var(--muted);font-size:11.5px}
+.arrow{color:var(--faint)}
+.wb{display:flex;flex-direction:column;gap:8px;padding:12px;border:1px dashed var(--rule);border-radius:10px}
+.wb-h{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:13px}
+.wb-h span{color:var(--muted)}
+.iss{display:flex;flex-direction:column;gap:6px}
+.issue{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:start;padding:10px 12px;border-radius:10px;background:var(--bg);border:1px solid var(--rule);font-size:13.5px}
+.issue .sev{font:600 11px/1 var(--body);letter-spacing:.06em;text-transform:uppercase;padding:4px 7px;border-radius:5px;white-space:nowrap}
+.sev.crit{background:var(--crit-bg);color:var(--crit)}
+.sev.warn{background:var(--warn-bg);color:var(--warn)}
+.sev.ok{background:var(--ok-bg);color:var(--ok)}
+.sev.info{background:var(--sunk);color:var(--muted)}
+.issue .d{font:500 12px/1.4 var(--mono);color:var(--muted)}
+
+/* documents */
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.chip{border:1px solid var(--rule);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:500;color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+select.chip{appearance:auto}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.doc{background:var(--surface);border:1px solid var(--rule);border-radius:12px;overflow:hidden;padding:0;text-align:left;display:flex;flex-direction:column}
+.doc img{width:100%;aspect-ratio:3/4;object-fit:cover;background:var(--sunk);display:block}
+.doc div{padding:8px 10px;font-size:12px;line-height:1.35}
+.doc b{display:block;font-size:12.5px}
+.doc span{color:var(--muted)}
+.doc:hover{border-color:var(--accent)}
+.empty{color:var(--muted);padding:24px;text-align:center}
+
+/* lightbox */
+.lb{position:fixed;inset:0;z-index:20;background:rgba(10,13,15,.92);display:grid;grid-template-rows:auto minmax(0,1fr) auto;padding:calc(env(safe-area-inset-top,0px) + 10px) 12px calc(env(safe-area-inset-bottom,0px) + 10px)}
+.lb-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;color:#E4E9E6;font-size:13px}
+.lb-bar button,.lb-nav button{background:rgba(255,255,255,.12);border:0;color:#fff;border-radius:999px;padding:8px 14px;font-weight:600}
+.lb-stage{overflow:auto;display:grid;place-items:center;min-height:0}
+.lb-stage img{max-width:100%;max-height:100%;object-fit:contain;cursor:zoom-in;border-radius:4px}
+.lb-stage.zoom{place-items:start}
+.lb-stage.zoom img{max-width:none;max-height:none;cursor:zoom-out}
+.lb-nav{display:flex;justify-content:center;gap:10px}
+.lb-cap{color:#C9D1CD;font-size:13px;text-align:center;max-width:70ch;margin:0 auto 8px}
+.lb a{color:#B9D3EF}
+.skeleton{color:var(--muted);padding:40px 0;text-align:center}
+.lb[hidden],.tip[hidden]{display:none!important}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.gate{max-width:380px;margin:12vh auto 0;background:var(--surface);border:1px solid var(--rule);border-radius:16px;box-shadow:var(--shadow);padding:24px;display:flex;flex-direction:column;gap:12px}
+.gate h2{font-size:22px;font-weight:800}
+.gate p{margin:0;color:var(--muted)}
+.gate input{font:600 22px/1 var(--mono);letter-spacing:.2em;text-align:center;padding:12px;border-radius:10px;border:1px solid var(--rule);background:var(--bg);color:var(--ink);width:100%}
+.gate button{border:0;border-radius:10px;padding:12px;background:var(--accent);color:var(--surface);font-weight:600}
+.gate .err{color:var(--crit);font-size:13px;min-height:18px}
+.lock{border:1px solid var(--rule);background:var(--surface);border-radius:999px;padding:6px 10px;font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="eyebrow" id="eyebrow">Szihalom BESS · Andezit-Bau Recsk → Szihalom</div>
+      <h1 id="title">Kőszállítások</h1>
+      <div class="sub" id="sub"></div>
+    </div>
+    <div class="top-r">
+      <span class="stamp" id="stamp"></span>
+      <div class="seg" role="group" aria-label="Nyelv / Language">
+        <button type="button" id="lang-hu" aria-pressed="true">HU</button>
+        <button type="button" id="lang-en" aria-pressed="false">EN</button>
+      </div>
+      <button type="button" class="lock" id="logout" hidden>🔒 <span id="logout-t">Kilépés</span></button>
+    </div>
+  </header>
+
+  <main id="app"><div class="skeleton" id="loading">Betöltés…</div></main>
+</div>
+
+<div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="Dokumentum">
+  <div class="lb-bar"><span id="lb-count"></span><span><a id="lb-open" href="#" target="_blank" rel="noopener"></a> &nbsp; <button type="button" id="lb-close">✕</button></span></div>
+  <div class="lb-stage" id="lb-stage"><img id="lb-img" alt=""></div>
+  <div><div class="lb-cap" id="lb-cap"></div><div class="lb-nav"><button type="button" id="lb-prev">←</button><button type="button" id="lb-next">→</button></div></div>
+</div>
+
+<script>
+'use strict';
+const T = {
+ hu:{ title:'Kőszállítások', sub:'Solarpro Technology · Sky Tech Line Kft. · szállító: Andezit-Bau Zrt., fuvarozó: Kárpátok Építőipari Kft.',
+  updated:'Frissítve', delivered:'zúzottkő leszállítva eddig', ofOrder:'a megrendelt mennyiségből', ordered:'megrendelve', remaining:'hátralévő',
+  loads:'forduló', days:'szállítási nap', trucks:'kamion', approx:n=>`≈ ${n} forduló van hátra`, avg:a=>`átlag ${a} t / forduló`,
+  daily:'Napi leszállított mennyiség', dailyNote:'tonna zúzottkő szállítási naponként', mix:'Termékek szerint', concrete:'Sovány beton CKT-4R',
+  tDays:'Napok', tDocs:'Dokumentumok', tIssues:'Teendők', open:'nyitott',
+  wd:['vasárnap','hétfő','kedd','szerda','csütörtök','péntek','szombat'], noDel:'nem volt szállítás',
+  loadsH:'Szállítások', wbH:'Fuvarlevelek', issH:'Megjegyzések', docs:'dokumentum', net:'nettó', gross:'bruttó', tare:'tára',
+  note:'Szállítólevél', waybill:'Fuvarlevél', own:'Sky Tech szállítólevél', photo:'Helyszíni fotó', all:'Mind', allDays:'Minden nap',
+  sev:{crit:'Hiba',warn:'Ellenőrizni',ok:'Rendben',info:'Info'}, done:'lezárva', openFull:'Eredeti méret', close:'Bezár',
+  loadedKm:'rakott km', totalKm:'össz. km', driver:'sofőr', start:'indulás', end:'vége', none:'Nincs a szűrésnek megfelelő dokumentum.',
+  cum:'összesen eddig', gateT:'Kőszállítások – Szihalom', gateP:'Írd be a belépési kódot. Csak egyszer kell, a böngésző megjegyzi.', gateBtn:'Belépés', bad:'Hibás kód, próbáld újra.', noCrypto:'Ez a böngésző nem tudja megnyitni a védett oldalt. Nyisd meg Chrome-ban vagy Safariban.', logout:'Kilépés', opening:'Megnyitás…', unload:'lerakva', weighed:'mérve', issuesOpen:'Nyitott kérdések', issuesClosed:'Lezárt / információ', noIssues:'Nincs nyitott kérdés.' },
+ en:{ title:'Stone deliveries', sub:'Solarpro Technology · Sky Tech Line Kft. · quarry: Andezit-Bau Zrt., haulier: Kárpátok Építőipari Kft.',
+  updated:'Updated', delivered:'crushed stone delivered to date', ofOrder:'of the ordered quantity', ordered:'ordered', remaining:'remaining',
+  loads:'loads', days:'delivery days', trucks:'trucks', approx:n=>`≈ ${n} loads to go`, avg:a=>`average ${a} t per load`,
+  daily:'Delivered per day', dailyNote:'tonnes of crushed stone per delivery day', mix:'By product', concrete:'Lean concrete CKT-4R',
+  tDays:'Days', tDocs:'Documents', tIssues:'To do', open:'open',
+  wd:['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'], noDel:'no deliveries',
+  loadsH:'Deliveries', wbH:'Waybills', issH:'Notes', docs:'documents', net:'net', gross:'gross', tare:'tare',
+  note:'Delivery note', waybill:'Waybill', own:'Sky Tech delivery note', photo:'Site photo', all:'All', allDays:'All days',
+  sev:{crit:'Error',warn:'Check',ok:'OK',info:'Info'}, done:'closed', openFull:'Full size', close:'Close',
+  loadedKm:'loaded km', totalKm:'total km', driver:'driver', start:'start', end:'end', none:'No documents match this filter.',
+  cum:'to date', gateT:'Stone deliveries – Szihalom', gateP:'Enter the access code. You only need to do this once; the browser remembers it.', gateBtn:'Open', bad:'Wrong code, try again.', noCrypto:'This browser cannot open the protected page. Use Chrome or Safari.', logout:'Log out', opening:'Opening…', unload:'unloaded', weighed:'weighed', issuesOpen:'Open questions', issuesClosed:'Closed / information', noIssues:'No open questions.' }
+};
+let L = 'hu', D = null, tab = 'days', docKind = 'all', docDay = 'all', LB = {list:[], i:0};
+try { const s = localStorage.getItem('szk-lang'); if (s === 'en' || s === 'hu') L = s; const tb = localStorage.getItem('szk-tab'); if (tb) tab = tb; } catch (e) {}
+if (['days','docs','issues'].includes(location.hash.slice(1))) tab = location.hash.slice(1);
+const t = (k, ...a) => { const v = T[L][k]; return typeof v === 'function' ? v(...a) : v; };
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const nf = (v, d = 0) => v == null || isNaN(v) ? '–' : new Intl.NumberFormat(L === 'hu' ? 'hu-HU' : 'en-GB', {minimumFractionDigits:d, maximumFractionDigits:d}).format(v);
+const sd = r => r.deliveredOn || r.date;
+const wd = d => t('wd')[new Date(d + 'T12:00').getDay()];
+const pName = k => (D.products[k] || {})[L] || k;
+const isStone = r => (D.products[r.productKey] || {}).basis !== 'volume';
+const tonnes = r => r.netKg != null ? r.netKg / 1000 : null;
+const m3 = r => isStone(r) ? tonnes(r) / ((D.products[r.productKey] || {}).density || 1.7) : r.qty;
+const sevClass = s => s === 'err' ? 'crit' : s === 'warn' ? 'warn' : s === 'ok' ? 'ok' : 'info';
+const plateKey = v => (v || '').toUpperCase().replace(/[^A-Z0-9 ]/g, '').split(' ')[0];
+
+/* ---------- summary numbers ---------- */
+function stats(){
+  const stone = D.records.filter(isStone), conc = D.records.filter(r => !isStone(r));
+  const tn = stone.reduce((a, r) => a + tonnes(r), 0), vol = stone.reduce((a, r) => a + m3(r), 0);
+  const order = D.orders.find(o => o.products.some(p => (D.products[p] || {}).basis !== 'volume'));
+  const delivered = order ? D.records.filter(r => order.products.includes(r.productKey)).reduce((a, r) => a + (order.unit === 'm3' ? m3(r) : tonnes(r)), 0) : vol;
+  const days = [...new Set(stone.map(sd))].sort();
+  const trucks = new Set(D.records.map(r => plateKey(r.vehicle)));
+  const avgM3 = vol / stone.length, remaining = order ? Math.max(0, order.qty - delivered) : 0;
+  const byProd = {}; stone.forEach(r => { const b = byProd[r.productKey] ||= {t:0, n:0}; b.t += tonnes(r); b.n++; });
+  return {stone, conc, tn, vol, order, delivered, days, trucks, avgT: tn / stone.length, remaining, toGo: Math.ceil(remaining / avgM3),
+    byProd, concM3: conc.reduce((a, r) => a + (r.qty || 0), 0), concOrder: D.orders.find(o => o.products.some(p => (D.products[p] || {}).basis === 'volume'))};
+}
+
+/* ---------- render ---------- */
+function render(){
+  document.documentElement.lang = L;
+  $('#lang-hu').setAttribute('aria-pressed', L === 'hu'); $('#lang-en').setAttribute('aria-pressed', L === 'en');
+  $('#title').textContent = t('title'); $('#sub').textContent = t('sub');
+  $('#stamp').textContent = `${t('updated')}: ${D.updated}`;
+  const S = stats(), pct = S.order ? S.delivered / S.order.qty * 100 : 0;
+  const openIss = D.issues.filter(i => i.status === 'open');
+  $('#app').innerHTML = `
+  <section class="readout" aria-label="${esc(t('delivered'))}">
+    <div>
+      <div class="big num">${nf(S.tn, 2)}<small>t</small></div>
+      <div class="big-cap">${t('delivered')} · <span class="mono">${nf(S.vol, 1)} m³</span></div>
+      <div class="facts">
+        <div class="fact"><b>${S.stone.length}</b><span>${t('loads')}</span></div>
+        <div class="fact"><b>${S.days.length}</b><span>${t('days')}</span></div>
+        <div class="fact"><b>${S.trucks.size}</b><span>${t('trucks')}</span></div>
+        <div class="fact"><b>${nf(S.avgT, 1)}</b><span>t / ${t('loads').replace(/s$/, '')}</span></div>
+      </div>
+    </div>
+    ${S.order ? `<div class="order">
+      <div class="eyebrow">${esc(S.order.name)}</div>
+      <div class="order-head"><b>${nf(pct, 1)} %</b><span>${t('ofOrder')}</span></div>
+      <div class="gauge" role="img" aria-label="${nf(pct, 1)} %"><i style="width:${Math.min(100, pct)}%"></i><u style="left:25%"></u><u style="left:50%"></u><u style="left:75%"></u></div>
+      <div class="gauge-scale"><span>0</span><span>${nf(S.order.qty / 2)}</span><span>${nf(S.order.qty)} m³</span></div>
+      <div class="order-head"><span><b class="mono" style="font-size:15px">${nf(S.delivered, 1)}</b> / ${nf(S.order.qty)} m³ ${t('ordered')}</span>
+        <span><b class="mono" style="font-size:15px">${nf(S.remaining, 1)} m³</b> ${t('remaining')}</span></div>
+      <div class="pill" style="align-self:flex-start">${t('approx', S.toGo)} · ${t('avg', nf(S.avgT, 2))}</div>
+    </div>` : ''}
+  </section>
+
+  <section class="row2">
+    <div class="panel"><h2>${t('daily')}</h2><div class="eyebrow" style="margin:-6px 0 10px">${t('dailyNote')}</div><div class="chart" id="chart"></div></div>
+    <div class="panel"><h2>${t('mix')}</h2><div class="mix">
+      ${Object.entries(S.byProd).sort((a, b) => b[1].t - a[1].t).map(([k, v]) => `<div class="mix-row"><span class="lbl">${esc(pName(k))}</span><span class="val">${nf(v.t, 2)} t · ${v.n} ${t('loads')}</span>
+        <span class="track"><i style="width:${v.t / S.tn * 100}%"></i></span></div>`).join('')}
+      ${S.conc.length ? `<div class="mix-note">${t('concrete')}: <span class="mono">${nf(S.concM3, 1)} m³</span> · ${S.conc.length} ${t('loads')}${S.concOrder ? ` (${nf(S.concM3 / S.concOrder.qty * 100)} % · ${nf(S.concOrder.qty)} m³ ${t('ordered')})` : ''}</div>` : ''}
+    </div></div>
+  </section>
+
+  <nav class="tabs" role="tablist">
+    <button type="button" role="tab" data-tab="days" aria-selected="${tab === 'days'}">${t('tDays')}<span class="count">${new Set(D.records.map(sd)).size}</span></button>
+    <button type="button" role="tab" data-tab="docs" aria-selected="${tab === 'docs'}">${t('tDocs')}<span class="count">${allDocs().length}</span></button>
+    <button type="button" role="tab" data-tab="issues" aria-selected="${tab === 'issues'}">${t('tIssues')}<span class="count ${openIss.length ? 'crit' : ''}">${openIss.length}</span></button>
+  </nav>
+  <section id="pane"></section>`;
+  drawChart(S);
+  $('#app').querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { tab = b.dataset.tab; try { localStorage.setItem('szk-tab', tab); } catch (e) {} render(); });
+  drawPane();
+}
+
+function drawChart(S){
+  const box = $('#chart'), days = S.days.map(d => ({d, t: S.stone.filter(r => sd(r) === d).reduce((a, r) => a + tonnes(r), 0), n: S.stone.filter(r => sd(r) === d).length}));
+  let cum = 0; days.forEach(x => { cum += x.t; x.cum = cum; });
+  const W = 640, H = 230, pl = 40, pr = 8, pt = 12, pb = 34, iw = W - pl - pr, ih = H - pt - pb;
+  const max = Math.max(...days.map(x => x.t)), step = max > 150 ? 50 : 25, top = Math.ceil(max / step) * step;
+  const y = v => pt + ih - v / top * ih, bw = iw / days.length, barW = Math.max(6, Math.min(34, bw - 6));
+  const ticks = []; for (let v = 0; v <= top; v += step) ticks.push(v);
+  const every = days.length > 14 ? 2 : 1;
+  box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(t('daily'))}">
+    ${ticks.map(v => `<line x1="${pl}" x2="${W - pr}" y1="${y(v)}" y2="${y(v)}" stroke="var(--rule)" stroke-width="1" ${v ? 'stroke-dasharray="2 4"' : ''}/>
+      <text x="${pl - 8}" y="${y(v) + 4}" text-anchor="end" font-size="11" font-family="IBM Plex Mono, monospace" fill="var(--faint)">${v}</text>`).join('')}
+    ${days.map((x, i) => { const cx = pl + bw * i + bw / 2, h = ih - (y(x.t) - pt);
+      const r = Math.min(4, barW / 2), x0 = cx - barW / 2, y0 = y(x.t);
+      return `<g class="b" data-i="${i}">
+        <rect x="${pl + bw * i}" y="${pt}" width="${bw}" height="${ih}" fill="transparent"/>
+        <path d="M${x0},${pt + ih} V${y0 + r} Q${x0},${y0} ${x0 + r},${y0} H${x0 + barW - r} Q${x0 + barW},${y0} ${x0 + barW},${y0 + r} V${pt + ih} Z" fill="var(--bar)"/>
+        ${i % every === 0 || i === days.length - 1 ? `<text x="${cx}" y="${H - 14}" text-anchor="middle" font-size="10.5" font-family="IBM Plex Mono, monospace" fill="var(--muted)">${x.d.slice(5).replace('-', '.')}</text>` : ''}
+      </g>`; }).join('')}
+    ${(() => { const i = days.length - 1, x = days[i]; return `<text x="${pl + bw * i + bw / 2}" y="${y(x.t) - 6}" text-anchor="middle" font-size="11" font-weight="600" font-family="IBM Plex Mono, monospace" fill="var(--ink)">${nf(x.t, 1)}</text>`; })()}
+  </svg><div class="tip" hidden></div>`;
+  const tip = box.querySelector('.tip'), svg = box.querySelector('svg');
+  box.querySelectorAll('.b').forEach(g => {
+    const show = () => { const x = days[+g.dataset.i], r = svg.getBoundingClientRect(), k = r.width / W;
+      tip.innerHTML = `${x.d} · ${wd(x.d)}<br><b>${nf(x.t, 2)} t</b> · ${x.n} ${t('loads')}<br>${t('cum')}: <b>${nf(x.cum, 1)} t</b>`;
+      tip.style.left = ((pl + bw * +g.dataset.i + bw / 2) * k) + 'px'; tip.style.top = (y(x.t) * k) + 'px'; tip.hidden = false; };
+    g.addEventListener('mouseenter', show); g.addEventListener('click', show);
+  });
+  svg.addEventListener('mouseleave', () => tip.hidden = true);
+}
+
+function drawPane(){
+  const p = $('#pane');
+  if (tab === 'docs') return drawDocs(p);
+  if (tab === 'issues') return drawIssues(p);
+  drawDays(p);
+}
+
+function thumbs(docs){
+  return `<div class="thumbs">${docs.map(d => `<button type="button" class="thumb" data-img="${esc(d.img)}" title="${esc(d.caption)}"><img data-enc="${esc(d.thumb)}" alt="${esc(d.caption)}"></button>`).join('')}</div>`;
+}
+
+function drawDays(p){
+  const dates = [...new Set([...D.records.map(sd), ...D.waybills.map(w => w.date), ...D.photos.map(x => x.date), ...D.issues.map(i => i.date)])].sort().reverse();
+  const latest = [...new Set(D.records.map(sd))].sort().pop();
+  p.innerHTML = dates.map(d => {
+    const recs = D.records.filter(r => sd(r) === d).sort((a, b) => (a.time || '').localeCompare(b.time || ''));
+    const wbs = D.waybills.filter(w => w.date === d), pics = D.photos.filter(x => x.date === d), iss = D.issues.filter(i => i.date === d);
+    const st = recs.filter(isStone), tn = st.reduce((a, r) => a + tonnes(r), 0), cm = recs.filter(r => !isStone(r)).reduce((a, r) => a + (r.qty || 0), 0);
+    const nDocs = recs.reduce((a, r) => a + r.docs.length, 0) + wbs.reduce((a, w) => a + w.docs.length, 0) + pics.length;
+    const openN = iss.filter(i => i.status === 'open'), crit = openN.some(i => i.severity === 'err');
+    return `<details class="day" ${d === latest ? 'open' : ''}>
+      <summary>
+        <span class="chev" aria-hidden="true">▸</span>
+        <span style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;min-width:0"><span class="day-date">${d.slice(5).replace('-', '.')}.<small>${d.slice(0, 4)} · ${wd(d)}</small></span>
+          <span class="day-meta">${recs.length ? `<span class="pill">${st.length} ${t('loads')}</span>` : `<span class="pill">${t('noDel')}</span>`}
+          ${nDocs ? `<span class="pill">${nDocs} ${t('docs')}</span>` : ''}
+          ${openN.length ? `<span class="pill ${crit ? 'crit' : 'warn'}">${openN.length} ${t('open')}</span>` : ''}</span></span>
+        <span class="day-t">${recs.length ? `<b>${nf(tn, 2)} t</b><span>${nf(st.reduce((a, r) => a + m3(r), 0), 1)} m³${cm ? ` · ${nf(cm, 0)} m³ beton` : ''}</span>` : ''}</span>
+      </summary>
+      <div class="day-body">
+        ${iss.length ? `<div class="iss">${iss.map(issueHTML).join('')}</div>` : ''}
+        ${recs.length ? `<div><div class="sub-h">${t('loadsH')}</div><div class="loads">${recs.map(r => `
+          <div class="load">
+            <span class="tm">${esc(r.time || '')}</span>
+            <span class="who"><b>${esc(r.vehicle || '–')}</b> · ${esc(pName(r.productKey))}
+              <div>${esc(r.noteNo || '')}${r.ekaer ? ' · EKÁER ' + esc(r.ekaer) : ''}${r.driver ? ' · ' + esc(r.driver) : ''}${r.waybillNo ? ' · ' + t('waybill').toLowerCase() + ' ' + esc(r.waybillNo) : ''}</div>
+              ${r.grossKg ? `<div class="mono">${t('gross')} ${nf(r.grossKg)} · ${t('tare')} ${nf(r.tareKg)} kg${r.tareAt ? ` (${esc(r.tareAt)})` : ''}</div>` : ''}
+              ${r.deliveredOn && r.deliveredOn !== r.date ? `<div><span class="pill warn">${t('weighed')} ${esc(r.date)} · ${t('unload')} ${esc(r.deliveredOn)}</span></div>` : ''}</span>
+            <span class="net">${isStone(r) ? nf(tonnes(r), 2) + ' t' : nf(r.qty, 1) + ' m³'}<small>${t('net')}${isStone(r) ? ' · ' + nf(m3(r), 1) + ' m³' : ''}</small></span>
+            ${r.remark ? `<div class="rmk">${esc(r.remark)}</div>` : ''}
+            ${r.docs.length ? `<div class="thumbs-wrap" style="grid-column:2/-1">${thumbs(r.docs)}</div>` : ''}
+          </div>`).join('')}</div></div>` : ''}
+        ${wbs.length ? `<div><div class="sub-h">${t('wbH')}</div><div style="display:flex;flex-direction:column;gap:8px">${wbs.map(wbHTML).join('')}</div></div>` : ''}
+        ${pics.length ? `<div><div class="sub-h">${t('photo')}</div>${thumbs(pics)}</div>` : ''}
+      </div></details>`;
+  }).join('');
+  bindThumbs(p); lazyImgs(p);
+}
+
+function wbHTML(w){
+  const legs = (w.legs || []).filter(l => l.place);
+  return `<div class="wb">
+    <div class="wb-h"><b>${t('waybill')} ${esc(w.no)} · ${esc(w.plates || '')}</b><span>${esc(w.driver || '')}${w.make ? ' · ' + esc(w.make) : ''}${w.start ? ` · ${t('start')} ${esc(w.start)}` : ''}${w.end ? ` · ${t('end')} ${esc(w.end)}` : ''}</span></div>
+    ${legs.length ? `<div class="route">${legs.map((l, i) => `${i ? '<span class="arrow">→</span>' : ''}<span class="stop"><b>${esc(l.place)}</b>${l.arr || l.dep ? ` <span class="mono">${esc([l.arr, l.dep].filter(Boolean).join('–'))}</span>` : ''}${l.up ? ` <span class="mono">▲${esc(l.up)} t</span>` : ''}${l.down ? ` <span class="mono">▼${esc(l.down)} t</span>` : ''}</span>`).join('')}</div>` : ''}
+    <div class="wb-h"><span class="mono">${w.totalT != null ? nf(w.totalT, 2) + ' t' : ''}${w.loadedKm != null ? ` · ${w.loadedKm} ${t('loadedKm')}` : ''}${w.totalKm != null ? ` · ${w.totalKm} ${t('totalKm')}` : ''}</span></div>
+    ${w.remark ? `<div style="font-size:12.5px;color:var(--muted)">${esc(w.remark)}</div>` : ''}
+    ${thumbs(w.docs)}
+  </div>`;
+}
+
+function issueHTML(i){
+  const c = i.status === 'open' ? sevClass(i.severity) : i.severity === 'info' ? 'info' : 'ok';
+  const lbl = i.status === 'closed' ? t('done') : t('sev')[c];
+  return `<div class="issue"><span class="sev ${c}">${esc(lbl)}</span><div>${esc(i.text)}<div class="d">${esc(i.date)}</div></div></div>`;
+}
+
+function drawIssues(p){
+  const open = D.issues.filter(i => i.status === 'open').sort((a, b) => (a.severity === 'err' ? 0 : 1) - (b.severity === 'err' ? 0 : 1) || b.date.localeCompare(a.date));
+  const rest = D.issues.filter(i => i.status !== 'open').sort((a, b) => b.date.localeCompare(a.date));
+  p.innerHTML = `<div class="sub-h">${t('issuesOpen')}</div><div class="iss">${open.map(issueHTML).join('') || `<div class="empty">${t('noIssues')}</div>`}</div>
+    <div class="sub-h" style="margin-top:22px">${t('issuesClosed')}</div><div class="iss">${rest.map(issueHTML).join('')}</div>`;
+}
+
+function allDocs(){
+  const out = [];
+  D.records.forEach(r => r.docs.forEach(d => out.push({...d, date: sd(r), label: `${r.noteNo || r.vehicle} · ${r.vehicle || ''}`})));
+  D.waybills.forEach(w => w.docs.forEach(d => out.push({...d, date: w.date, label: `${t('waybill')} ${w.no} · ${w.plates || ''}`})));
+  D.photos.forEach(x => out.push({...x, kind: 'photo', label: x.caption}));
+  return out.sort((a, b) => b.date.localeCompare(a.date));
+}
+function drawDocs(p){
+  const docs = allDocs(), dates = [...new Set(docs.map(d => d.date))].sort().reverse();
+  const kinds = ['all', 'note', 'waybill', 'own', 'photo'].filter(k => k === 'all' || docs.some(d => d.kind === k));
+  const list = docs.filter(d => (docKind === 'all' || d.kind === docKind) && (docDay === 'all' || d.date === docDay));
+  p.innerHTML = `<div class="filters">
+      ${kinds.map(k => `<button type="button" class="chip" data-kind="${k}" aria-pressed="${docKind === k}">${t(k)}</button>`).join('')}
+      <select class="chip" id="docDay" aria-label="${esc(t('allDays'))}"><option value="all">${t('allDays')}</option>${dates.map(d => `<option value="${d}" ${d === docDay ? 'selected' : ''}>${d} · ${wd(d)}</option>`).join('')}</select>
+    </div>
+    ${list.length ? `<div class="grid">${list.map(d => `<button type="button" class="doc" data-img="${esc(d.img)}"><img data-enc="${esc(d.thumb)}" alt="">
+      <div><b>${esc(t(d.kind) || d.kind)}</b><span>${esc(d.date)} · ${esc(d.label)}</span></div></button>`).join('')}</div>` : `<div class="empty">${t('none')}</div>`}`;
+  p.querySelectorAll('[data-kind]').forEach(b => b.onclick = () => { docKind = b.dataset.kind; drawDocs(p); });
+  $('#docDay').onchange = e => { docDay = e.target.value; drawDocs(p); };
+  bindThumbs(p); lazyImgs(p);
+}
+
+/* ---------- lightbox ---------- */
+function bindThumbs(scope){
+  const btns = [...scope.querySelectorAll('[data-img]')];
+  const docs = allDocs(), byImg = Object.fromEntries(docs.map(d => [d.img, d]));
+  btns.forEach((b, i) => b.onclick = () => { LB.list = btns.map(x => byImg[x.dataset.img]).filter(Boolean); LB.i = LB.list.findIndex(d => d.img === b.dataset.img); openLB(); });
+}
+function openLB(){
+  const d = LB.list[LB.i]; if (!d) return;
+  $('#lb-img').removeAttribute('src'); $('#lb-img').alt = d.caption || '';
+  const want = d.img; imgURL(d.img).then(u => { if (LB.list[LB.i] && LB.list[LB.i].img === want){ $('#lb-img').src = u; $('#lb-open').href = u; } });
+  $('#lb-cap').textContent = `${t(d.kind) || ''} · ${d.date} · ${d.caption || d.label || ''}`;
+  $('#lb-count').textContent = `${LB.i + 1} / ${LB.list.length}`;
+  $('#lb-open').textContent = t('openFull'); $('#lb-close').setAttribute('aria-label', t('close'));
+  $('#lb-stage').classList.remove('zoom'); $('#lb').hidden = false; $('#lb-close').focus();
+}
+const closeLB = () => { $('#lb').hidden = true; };
+$('#lb-close').onclick = closeLB;
+$('#lb-prev').onclick = () => { LB.i = (LB.i - 1 + LB.list.length) % LB.list.length; openLB(); };
+$('#lb-next').onclick = () => { LB.i = (LB.i + 1) % LB.list.length; openLB(); };
+$('#lb-img').onclick = () => $('#lb-stage').classList.toggle('zoom');
+$('#lb').addEventListener('click', e => { if (e.target.id === 'lb-stage') closeLB(); });
+document.addEventListener('keydown', e => { if ($('#lb').hidden) return;
+  if (e.key === 'Escape') closeLB(); if (e.key === 'ArrowLeft') $('#lb-prev').click(); if (e.key === 'ArrowRight') $('#lb-next').click(); });
+
+function setLang(l){ L = l; try { localStorage.setItem('szk-lang', l); } catch (e) {} $('#logout-t').textContent = t('logout'); if (D) render(); else if ($('#gate')){ $('#gate h2').textContent = t('gateT'); $('#gate p').textContent = t('gateP'); $('#gate button').textContent = t('gateBtn'); } }
+$('#lang-hu').onclick = () => setLang('hu'); $('#lang-en').onclick = () => setLang('en');
+
+/* ---------- access code + decryption (PBKDF2-SHA256 -> AES-GCM-256; every file is IV(12) + ciphertext) ---------- */
+const ENC = {"salt": "h2OX1OOwPI4cHSPNHikZ+w==", "iter": 300000};
+const LS_CODE = 'szk-code';
+const b64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+let KEY = null; const URLS = {};
+async function deriveKey(code){
+  const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(code), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey({name:'PBKDF2', salt:b64(ENC.salt), iterations:ENC.iter, hash:'SHA-256'}, base, {name:'AES-GCM', length:256}, false, ['decrypt']);
+}
+async function getFile(path){
+  const r = await fetch(path, {cache:'no-cache'}); if (!r.ok) throw new Error(path + ': ' + r.status);
+  const buf = new Uint8Array(await r.arrayBuffer());
+  if (!ENC) return buf;
+  return new Uint8Array(await crypto.subtle.decrypt({name:'AES-GCM', iv:buf.slice(0, 12)}, KEY, buf.slice(12)));
+}
+function imgURL(path){
+  return URLS[path] ||= getFile(path).then(b => URL.createObjectURL(new Blob([b], {type:'image/jpeg'})));
+}
+const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting){ io.unobserve(e.target); show(e.target); } }), {rootMargin:'300px'}) : null;
+function show(im){ imgURL(im.dataset.enc).then(u => im.src = u).catch(() => {}); }
+function lazyImgs(scope){ scope.querySelectorAll('img[data-enc]').forEach(im => io ? io.observe(im) : show(im)); }
+function gate(msg){
+  return new Promise(resolve => {
+    $('#app').innerHTML = `<form class="gate" id="gate"><h2>${t('gateT')}</h2><p>${t('gateP')}</p>
+      <input id="code" type="password" inputmode="numeric" autocomplete="current-password" aria-label="${esc(t('gateBtn'))}">
+      <div class="err">${esc(msg || '')}</div><button type="submit">${t('gateBtn')}</button></form>`;
+    $('#code').focus();
+    $('#gate').onsubmit = e => { e.preventDefault(); const v = $('#code').value.replace(/\s+/g, ''); if (v){ $('#app').innerHTML = `<div class="skeleton">${t('opening')}</div>`; resolve(v); } };
+  });
+}
+async function start(){
+  if (ENC && !(window.crypto && crypto.subtle)){ $('#app').innerHTML = `<div class="skeleton">${t('noCrypto')}</div>`; return; }
+  let code = null; try { code = localStorage.getItem(LS_CODE); } catch (e) {}
+  if (ENC && !code) code = await gate();
+  for (;;){
+    try {
+      if (ENC) KEY = await deriveKey(code);
+      D = JSON.parse(new TextDecoder().decode(await getFile('data.enc')));
+      break;
+    } catch (e){
+      if (e.name !== 'OperationError'){ $('#app').innerHTML = `<div class="skeleton">${esc(e.message)}</div>`; return; }
+      try { localStorage.removeItem(LS_CODE); } catch (x) {}
+      code = await gate(t('bad'));
+    }
+  }
+  try { if (ENC) localStorage.setItem(LS_CODE, code); } catch (e) {}
+  $('#logout').hidden = !ENC; render();
+}
+$('#logout').onclick = () => { try { localStorage.removeItem(LS_CODE); } catch (e) {} location.reload(); };
+start();
+</script>
+</body>
+</html>
