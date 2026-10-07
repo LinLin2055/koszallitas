@@ -258,6 +258,37 @@ select.chip{appearance:auto}
 .more{border-top:1px solid var(--rule);padding-top:10px}
 .more>summary{cursor:pointer;font-weight:600;color:var(--accent);padding:4px 0}
 .more[open]>summary{margin-bottom:10px}
+.st{width:22px;height:22px;border-radius:50%;display:inline-grid;place-items:center;font:800 12px/1 var(--body);flex:none}
+.st.ok{background:var(--ok-bg);color:var(--ok)}
+.st.check{background:var(--warn-bg);color:var(--warn)}
+.st.miss{background:var(--crit-bg);color:var(--crit)}
+.trow .w{display:flex;align-items:center;justify-content:flex-end;gap:8px}
+.why{grid-column:3/-1;font-size:12.5px;line-height:1.4;color:var(--warn);margin-top:-6px}
+.why.miss{color:var(--crit);font-weight:600}
+.trow.miss{border:2px dashed var(--crit);border-radius:12px;padding:10px;margin:8px 0;background:var(--crit-bg)}
+.trow.miss svg{color:var(--crit)}
+.trow.miss .pl small{color:var(--crit)}
+.keys{display:flex;flex-direction:column;gap:8px;background:var(--surface);border:1px solid var(--rule);border-radius:14px;padding:14px 16px;margin-bottom:12px;font-size:13.5px}
+.keys div{display:flex;align-items:center;gap:10px}
+.keys b{font-weight:600}
+.alert{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:start;border-radius:14px;padding:14px 16px;margin-top:16px;border:1px solid}
+.alert.miss{background:var(--crit-bg);border-color:var(--crit);color:var(--ink)}
+.alert.check{background:var(--warn-bg);border-color:var(--warn);color:var(--ink)}
+.alert .ic{font:800 20px/1 var(--display)}
+.alert.miss .ic{color:var(--crit)} .alert.check .ic{color:var(--warn)}
+.alert b{display:block;font-size:16px}
+.alert p{margin:3px 0 0;font-size:13.5px;color:var(--muted)}
+.alert ul{margin:8px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+.alert li button{border:0;background:none;padding:0;color:var(--accent);font-weight:600;text-align:left;text-decoration:underline}
+.fleet .miss{color:var(--crit);opacity:.9;outline:2px dashed var(--crit);outline-offset:1px;border-radius:4px}
+.grp{background:var(--surface);border:1px solid var(--rule);border-radius:14px;padding:16px;margin-bottom:12px}
+.grp h3{font-size:17px;display:flex;align-items:center;gap:10px}
+.grp>p{margin:4px 0 12px;color:var(--muted);font-size:13.5px}
+.it{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;padding:10px 0;border-top:1px solid var(--rule)}
+.it:first-of-type{border-top:0}
+.it .d{font:500 12px/1.4 var(--mono);color:var(--muted)}
+.it .long{grid-column:1/-1;font-size:12.5px;color:var(--muted)}
+.it button{border:1px solid var(--rule);background:var(--bg);border-radius:8px;padding:6px 10px;font-size:12.5px;font-weight:600;color:var(--accent);white-space:nowrap;align-self:start}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 .gate{max-width:380px;margin:12vh auto 0;background:var(--surface);border:1px solid var(--rule);border-radius:16px;box-shadow:var(--shadow);padding:24px;display:flex;flex-direction:column;gap:12px}
 .gate h2{font-size:22px;font-weight:800}
@@ -310,7 +341,7 @@ const T = {
   note:'Szállítólevél', waybill:'Fuvarlevél', own:'Sky Tech szállítólevél', photo:'Helyszíni fotó', all:'Mind', allDays:'Minden nap',
   sev:{crit:'Hiba',warn:'Ellenőrizni',ok:'Rendben',info:'Info'}, done:'lezárva', openFull:'Eredeti méret', close:'Bezár',
   loadedKm:'rakott km', totalKm:'össz. km', driver:'sofőr', start:'indulás', end:'vége', none:'Nincs a szűrésnek megfelelő dokumentum.',
-  cum:'összesen eddig', perTruck:'Kamiononként', trips:n=>`${n} forduló`, tapRow:'Koppints egy sorra a részletekért és a papírokért.', moreH:(w,f)=>`Fuvarlevelek${w ? ` (${w})` : ''}${f ? ` és fotók (${f})` : ''}`, dayList:'Minden kamion aznap', home:'Áttekintés', papers:'Papírok', arrived:'Megjött', stillNeed:'Még kell', ofOrd:'a rendelésből', fleetT:'Kamionok a rendelésből', fleetH:'Egy ikon = egy kamion kő (kb. 26 t)', legOn:'megjött', legNew:'legutóbbi nap', legOff:'még jön', lastDay:'Legutóbbi szállítás', todayW:'Ma', truckN:n=>`${n} kamion`, aboutT:n=>`≈ ${n} kamion`, seeDay:'Papírok és részletek', chartH:'Mennyi jött naponta', chartHint:'tonna kő naponként, a szám az oszlop tetején', mixH:'Milyen kő jött', gateT:'Kőszállítások – Szihalom', gateP:'Írd be a belépési kódot. Csak egyszer kell, a böngésző megjegyzi.', gateBtn:'Belépés', bad:'Hibás kód, próbáld újra.', noCrypto:'Ez a böngésző nem tudja megnyitni a védett oldalt. Nyisd meg Chrome-ban vagy Safariban.', logout:'Kilépés', opening:'Megnyitás…', unload:'lerakva', weighed:'mérve', issuesOpen:'Nyitott kérdések', issuesClosed:'Lezárt / információ', noIssues:'Nincs nyitott kérdés.' },
+  cum:'összesen eddig', stOk:'Beszámolva, rendben', stCheck:'Beszámolva, de ellenőrizni kell (az ok a sor alatt)', stMiss:'NINCS beszámolva – megjött, de nincs róla papír', keysH:'Mit jelentenek a jelek?', missRow:'Hiányzó szállítólevél', allOk:'✓ minden beszámolva', nMiss:n=>`${n} nincs beszámolva`, nCheck:n=>`${n} ellenőrizni`, paperH:'Papírmunka (a mennyiséget nem érinti)', infoH:'Információ', grpMiss:'Nincs beszámolva', grpMissP:'Ezek a fordulók megtörténtek, de nincs róluk szállítólevél, ezért NINCSENEK benne a számokban. Kérjük el a papírt a sofőrtől / Kárpátoktól.', grpCheck:'Beszámolva, de ellenőrizni kell', grpCheckP:'Benne vannak a számokban, de valami nem stimmel a papíron.', grpPaper:'Papírmunka', grpPaperP:'Számlázási / adminisztratív kérdés, a leszállított kő mennyiségét nem érinti.', grpInfo:'Információ, lezárt ügyek', goDay:'Nap →', alertMiss:n=>`${n} kamion nincs beszámolva`, alertMissP:'Megjött, de nincs róla szállítólevél, ezért nincs benne a számokban.', alertCheck:n=>`${n} szállítás beszámolva, de ellenőrizni kell`, alertCheckP:'Benne vannak a számokban. Részletek a Teendők fülön.', legMiss:'nincs papír', estT:t=>`kb. ${t} t, nincs beszámolva`, perTruck:'Kamiononként', trips:n=>`${n} forduló`, tapRow:'Koppints egy sorra a részletekért és a papírokért.', moreH:(w,f)=>`Fuvarlevelek${w ? ` (${w})` : ''}${f ? ` és fotók (${f})` : ''}`, dayList:'Minden kamion aznap', home:'Áttekintés', papers:'Papírok', arrived:'Megjött', stillNeed:'Még kell', ofOrd:'a rendelésből', fleetT:'Kamionok a rendelésből', fleetH:'Egy ikon = egy kamion kő (kb. 26 t)', legOn:'megjött', legNew:'legutóbbi nap', legOff:'még jön', lastDay:'Legutóbbi szállítás', todayW:'Ma', truckN:n=>`${n} kamion`, aboutT:n=>`≈ ${n} kamion`, seeDay:'Papírok és részletek', chartH:'Mennyi jött naponta', chartHint:'tonna kő naponként, a szám az oszlop tetején', mixH:'Milyen kő jött', gateT:'Kőszállítások – Szihalom', gateP:'Írd be a belépési kódot. Csak egyszer kell, a böngésző megjegyzi.', gateBtn:'Belépés', bad:'Hibás kód, próbáld újra.', noCrypto:'Ez a böngésző nem tudja megnyitni a védett oldalt. Nyisd meg Chrome-ban vagy Safariban.', logout:'Kilépés', opening:'Megnyitás…', unload:'lerakva', weighed:'mérve', issuesOpen:'Nyitott kérdések', issuesClosed:'Lezárt / információ', noIssues:'Nincs nyitott kérdés.' },
  en:{ title:'Stone deliveries', sub:'Solarpro Technology · Sky Tech Line Kft. · quarry: Andezit-Bau Zrt., haulier: Kárpátok Építőipari Kft.',
   updated:'Updated', delivered:'crushed stone delivered to date', ofOrder:'of the ordered quantity', ordered:'ordered', remaining:'remaining',
   loads:'loads', days:'delivery days', trucks:'trucks', approx:n=>`≈ ${n} loads to go`, avg:a=>`average ${a} t per load`,
@@ -321,7 +352,7 @@ const T = {
   note:'Delivery note', waybill:'Waybill', own:'Sky Tech delivery note', photo:'Site photo', all:'All', allDays:'All days',
   sev:{crit:'Error',warn:'Check',ok:'OK',info:'Info'}, done:'closed', openFull:'Full size', close:'Close',
   loadedKm:'loaded km', totalKm:'total km', driver:'driver', start:'start', end:'end', none:'No documents match this filter.',
-  cum:'to date', perTruck:'Per truck', trips:n=>`${n} ${n === 1 ? 'trip' : 'trips'}`, tapRow:'Tap a row for details and papers.', moreH:(w,f)=>`Waybills${w ? ` (${w})` : ''}${f ? ` and photos (${f})` : ''}`, dayList:'Every truck that day', home:'Overview', papers:'Papers', arrived:'Arrived', stillNeed:'Still to come', ofOrd:'of the order', fleetT:'Trucks in the order', fleetH:'One icon = one truck of stone (about 26 t)', legOn:'arrived', legNew:'latest day', legOff:'still to come', lastDay:'Latest delivery', todayW:'Today', truckN:n=>`${n} trucks`, aboutT:n=>`≈ ${n} trucks`, seeDay:'Papers and details', chartH:'How much came each day', chartHint:'tonnes of stone per day, value on top of each bar', mixH:'Which stone came', gateT:'Stone deliveries – Szihalom', gateP:'Enter the access code. You only need to do this once; the browser remembers it.', gateBtn:'Open', bad:'Wrong code, try again.', noCrypto:'This browser cannot open the protected page. Use Chrome or Safari.', logout:'Log out', opening:'Opening…', unload:'unloaded', weighed:'weighed', issuesOpen:'Open questions', issuesClosed:'Closed / information', noIssues:'No open questions.' }
+  cum:'to date', stOk:'Counted, all fine', stCheck:'Counted, but needs checking (reason under the row)', stMiss:'NOT counted – arrived, but there is no paper', keysH:'What the marks mean', missRow:'Missing delivery note', allOk:'✓ all counted', nMiss:n=>`${n} not counted`, nCheck:n=>`${n} to check`, paperH:'Paperwork (does not change the quantity)', infoH:'Information', grpMiss:'Not counted', grpMissP:'These loads were delivered but have no delivery note, so they are NOT in the totals. Ask the driver / Kárpátok for the paper.', grpCheck:'Counted, but needs checking', grpCheckP:'They are in the totals, but something on the paper is off.', grpPaper:'Paperwork', grpPaperP:'Billing / admin questions; the quantity of stone delivered is not affected.', grpInfo:'Information, closed items', goDay:'Day →', alertMiss:n=>`${n} truck not counted`, alertMissP:'It arrived, but there is no delivery note, so it is not in the totals.', alertCheck:n=>`${n} deliveries counted but need checking`, alertCheckP:'They are in the totals. Details on the To do tab.', legMiss:'no paper', estT:t=>`about ${t} t, not counted`, perTruck:'Per truck', trips:n=>`${n} ${n === 1 ? 'trip' : 'trips'}`, tapRow:'Tap a row for details and papers.', moreH:(w,f)=>`Waybills${w ? ` (${w})` : ''}${f ? ` and photos (${f})` : ''}`, dayList:'Every truck that day', home:'Overview', papers:'Papers', arrived:'Arrived', stillNeed:'Still to come', ofOrd:'of the order', fleetT:'Trucks in the order', fleetH:'One icon = one truck of stone (about 26 t)', legOn:'arrived', legNew:'latest day', legOff:'still to come', lastDay:'Latest delivery', todayW:'Today', truckN:n=>`${n} trucks`, aboutT:n=>`≈ ${n} trucks`, seeDay:'Papers and details', chartH:'How much came each day', chartHint:'tonnes of stone per day, value on top of each bar', mixH:'Which stone came', gateT:'Stone deliveries – Szihalom', gateP:'Enter the access code. You only need to do this once; the browser remembers it.', gateBtn:'Open', bad:'Wrong code, try again.', noCrypto:'This browser cannot open the protected page. Use Chrome or Safari.', logout:'Log out', opening:'Opening…', unload:'unloaded', weighed:'weighed', issuesOpen:'Open questions', issuesClosed:'Closed / information', noIssues:'No open questions.' }
 };
 let L = 'hu', D = null, tab = 'home', openDay = null, docKind = 'all', docDay = 'all', LB = {list:[], i:0};
 try { const s = localStorage.getItem('szk-lang'); if (s === 'en' || s === 'hu') L = s; const tb = localStorage.getItem('szk-tab'); if (tb) tab = tb; } catch (e) {}
@@ -338,6 +369,21 @@ const tonnes = r => r.netKg != null ? r.netKg / 1000 : null;
 const m3 = r => isStone(r) ? tonnes(r) / ((D.products[r.productKey] || {}).density || 1.7) : r.qty;
 const sevClass = s => s === 'err' ? 'crit' : s === 'warn' ? 'warn' : s === 'ok' ? 'ok' : 'info';
 const plateKey = v => (v || '').toUpperCase().replace(/[^A-Z0-9 ]/g, '').split(' ')[0];
+
+const recIss = r => D.issues.filter(i => (i.refs || []).includes(r.noteNo));
+const recState = r => recIss(r).some(i => i.status === 'open' && i.affects === 'check') ? 'check' : 'ok';
+const ST = {ok:'✓', check:'!', miss:'✕'};
+const stIcon = k => `<span class="st ${k}" title="${esc(t(k === 'ok' ? 'stOk' : k === 'check' ? 'stCheck' : 'stMiss'))}">${ST[k]}</span>`;
+const missing = () => D.missing || [];
+const openOf = a => D.issues.filter(i => i.status === 'open' && i.affects === a);
+function whyHTML(r){
+  const w = recIss(r).filter(i => i.status === 'open' && i.affects === 'check');
+  return w.length ? `<span class="why">${w.map(i => '⚠ ' + esc(i.short || i.text)).join('<br>')}</span>` : '';
+}
+function missRowHTML(x){
+  return `<div class="trow miss"><span class="tm">?</span>${TRUCK}<span class="pl">${esc(x.vehicle)}<small>${t('missRow')}${x.waybillNo ? ' · ' + t('waybill').toLowerCase() + ' ' + esc(x.waybillNo) : ''}</small></span><span class="w">${stIcon('miss')}? t</span>
+    <span class="why miss">✕ ${esc(t('estT', nf(x.estT, 1)))}. ${esc(x.reason)}</span></div>`;
+}
 
 /* ---------- summary numbers ---------- */
 function stats(){
@@ -374,7 +420,7 @@ function render(){
   const openIss = D.issues.filter(i => i.status === 'open');
   const nav = $('#nav'); nav.hidden = false;
   nav.innerHTML = [['home', t('home')], ['days', t('tDays')], ['docs', t('papers')], ['issues', t('tIssues')]].map(([k, l]) =>
-    `<button type="button" data-tab="${k}" ${tab === k ? 'aria-current="page"' : ''}>${ICON[k]}<span>${l}</span>${k === 'issues' && openIss.length ? `<span class="badge">${openIss.length}</span>` : ''}</button>`).join('');
+    `<button type="button" data-tab="${k}" ${tab === k ? 'aria-current="page"' : ''}>${ICON[k]}<span>${l}</span>${k === 'issues' && (openOf('missing').length + openOf('check').length) ? `<span class="badge">${openOf('missing').length + openOf('check').length}</span>` : ''}</button>`).join('');
   nav.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => setTab(b.dataset.tab));
   $('#app').innerHTML = '<section id="pane"></section>';
   drawPane();
@@ -413,18 +459,24 @@ function drawHome(p){
     ${S.order ? `<div class="hero-foot"><span>${esc(S.order.name)}</span><span><b>${nf(S.delivered, 1)}</b> / ${nf(S.order.qty)} m³</span></div>` : ''}
   </section>
 
+  ${missing().length ? `<div class="alert miss"><span class="ic">✕</span><div><b>${t('alertMiss', missing().length)}</b><p>${t('alertMissP')}</p>
+    <ul>${missing().map(x => `<li><button type="button" data-day="${x.date}">${x.date.slice(5).replace('-', '.')}. ${wd(x.date)} · ${esc(x.vehicle)}</button></li>`).join('')}</ul></div></div>` : ''}
+  ${S.stone.filter(r => recState(r) === 'check').length ? `<div class="alert check"><span class="ic">!</span><div><b>${t('alertCheck', S.stone.filter(r => recState(r) === 'check').length)}</b><p>${t('alertCheckP')}</p>
+    <ul>${S.stone.filter(r => recState(r) === 'check').map(r => `<li><button type="button" data-day="${sd(r)}">${sd(r).slice(5).replace('-', '.')}. · ${esc(r.vehicle)} · ${esc(r.noteNo)}</button></li>`).join('')}</ul></div></div>` : ''}
+
   <section class="panel sect">
     <h2>${t('fleetT')}<span class="hint">${t('fleetH')}</span></h2>
     <div class="fleet" role="img" aria-label="${inOrder.length} / ${inOrder.length + S.toGo}">
-      ${Array.from({length: nOn}, () => `<span class="on">${TRUCK}</span>`).join('')}${Array.from({length: nNew}, () => `<span class="new">${TRUCK}</span>`).join('')}${Array.from({length: S.toGo}, () => `<span class="off">${TRUCK}</span>`).join('')}
+      ${Array.from({length: nOn}, () => `<span class="on">${TRUCK}</span>`).join('')}${Array.from({length: nNew}, () => `<span class="new">${TRUCK}</span>`).join('')}${missing().map(() => `<span class="miss" title="${esc(t('missRow'))}">${TRUCK}</span>`).join('')}${Array.from({length: Math.max(0, S.toGo - missing().length)}, () => `<span class="off">${TRUCK}</span>`).join('')}
     </div>
-    <div class="legend"><span><i style="background:var(--accent)"></i>${nOn} ${t('legOn')}</span><span><i style="background:var(--warn)"></i>${nNew} ${t('legNew')} (${lastD.slice(5).replace('-', '.')}.)</span><span><i style="background:var(--rule)"></i>${S.toGo} ${t('legOff')}</span></div>
+    <div class="legend"><span><i style="background:var(--accent)"></i>${nOn} ${t('legOn')}</span><span><i style="background:var(--warn)"></i>${nNew} ${t('legNew')} (${lastD.slice(5).replace('-', '.')}.)</span>${missing().length ? `<span><i style="background:var(--crit-bg);outline:2px dashed var(--crit)"></i>${missing().length} ${t('legMiss')}</span>` : ''}<span><i style="background:var(--rule)"></i>${Math.max(0, S.toGo - missing().length)} ${t('legOff')}</span></div>
   </section>
 
   <section class="panel sect">
     <div class="last-h"><h2 style="margin:0">${isToday ? t('todayW') : t('lastDay')} · ${lastD.slice(5).replace('-', '.')}. ${wd(lastD)}</h2></div>
     <div class="last-big" style="margin:8px 0 6px">${nf(lastT, 1)} t<span>${t('truckN', lastRecs.length)}</span></div>
-    ${lastRecs.map(r => `<div class="trow"><span class="tm">${esc(r.time || '')}</span>${TRUCK}<span class="pl">${esc(r.vehicle || '–')}<small>${esc(pName(r.productKey))} · ${esc(r.noteNo || '')}</small></span><span class="w">${isStone(r) ? nf(tonnes(r), 1) + ' t' : nf(r.qty, 1) + ' m³'}</span></div>`).join('')}
+    ${lastRecs.map(r => `<div class="trow"><span class="tm">${esc(r.time || '')}</span>${TRUCK}<span class="pl">${esc(r.vehicle || '–')}<small>${esc(pName(r.productKey))} · ${esc(r.noteNo || '')}</small></span><span class="w">${stIcon(recState(r))}${isStone(r) ? nf(tonnes(r), 1) + ' t' : nf(r.qty, 1) + ' m³'}</span>${whyHTML(r)}</div>`).join('')}
+    ${missing().filter(x => x.date === lastD).map(missRowHTML).join('')}
     <button type="button" class="btn-line" id="seeDay">${t('seeDay')} →</button>
   </section>
 
@@ -437,6 +489,7 @@ function drawHome(p){
     </div></div>
   </section>`;
   $('#seeDay').onclick = () => setTab('days', lastD);
+  p.querySelectorAll('[data-day]').forEach(b => b.onclick = () => setTab('days', b.dataset.day));
   drawChart(S);
 }
 
@@ -483,29 +536,32 @@ function drawDays(p){
   const dates = [...new Set([...D.records.map(sd), ...D.waybills.map(w => w.date), ...D.photos.map(x => x.date), ...D.issues.map(i => i.date)])].sort().reverse();
   const latest = [...new Set(D.records.map(sd))].sort().pop();
   const amount = r => isStone(r) ? nf(tonnes(r), 1) + ' t' : nf(r.qty, 1) + ' m³';
-  p.innerHTML = `<p class="muted" style="margin:0 0 12px;color:var(--muted);font-size:13.5px">${t('tapRow')}</p>` + dates.map(d => {
+  p.innerHTML = `<div class="keys"><b>${t('keysH')}</b><div>${stIcon('ok')}${t('stOk')}</div><div>${stIcon('check')}${t('stCheck')}</div><div>${stIcon('miss')}${t('stMiss')}</div>
+    <div style="color:var(--muted)">${t('tapRow')}</div></div>` + [...new Set([...dates, ...missing().map(x => x.date)])].sort().reverse().map(d => {
     const recs = D.records.filter(r => sd(r) === d).sort((a, b) => (a.time || '').localeCompare(b.time || ''));
     const wbs = D.waybills.filter(w => w.date === d), pics = D.photos.filter(x => x.date === d), iss = D.issues.filter(i => i.date === d);
     const st = recs.filter(isStone), tn = st.reduce((a, r) => a + tonnes(r), 0), cm = recs.filter(r => !isStone(r)).reduce((a, r) => a + (r.qty || 0), 0);
-    const openN = iss.filter(i => i.status === 'open'), crit = openN.some(i => i.severity === 'err');
+    const miss = missing().filter(x => x.date === d), nChk = recs.filter(r => recState(r) === 'check').length;
+    const dayNotes = iss.filter(i => !(i.affects === 'check' && (i.refs || []).length) && i.affects !== 'missing' && !((i.refs || []).length && i.affects === 'info'));
     // per truck: tractor plate -> trips + amount
     const per = {};
-    recs.forEach(r => { const k = r.vehicle || '–', x = per[k] ||= {n:0, t:0, m3:0, stone:isStone(r)}; x.n++; if (isStone(r)) x.t += tonnes(r); else x.m3 += r.qty || 0; });
+    recs.forEach(r => { const k = r.vehicle || '–', x = per[k] ||= {n:0, t:0, m3:0, stone:isStone(r), miss:0}; x.n++; if (isStone(r)) x.t += tonnes(r); else x.m3 += r.qty || 0; });
+    miss.forEach(m => { const x = per[m.vehicle] ||= {n:0, t:0, m3:0, stone:true, miss:0}; x.miss++; });
     return `<details class="day" data-d="${d}" ${d === (openDay || latest) ? 'open' : ''}>
       <summary>
         <span class="chev" aria-hidden="true">▸</span>
         <span style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;min-width:0"><span class="day-date">${d.slice(5).replace('-', '.')}.<small>${d.slice(0, 4)} · ${wd(d)}</small></span>
           <span class="day-meta">${recs.length ? `<span class="pill">${t('truckN', recs.length)}</span>` : `<span class="pill">${t('noDel')}</span>`}
-          ${openN.length ? `<span class="pill ${crit ? 'crit' : 'warn'}">${openN.length} ${t('open')}</span>` : ''}</span></span>
+          ${miss.length ? `<span class="pill crit">✕ ${t('nMiss', miss.length)}</span>` : ''}${nChk ? `<span class="pill warn">! ${t('nCheck', nChk)}</span>` : ''}${recs.length && !miss.length && !nChk ? `<span class="pill ok">${t('allOk')}</span>` : ''}</span></span>
         <span class="day-t">${recs.length ? `<b>${st.length ? nf(tn, 1) + ' t' : nf(cm, 0) + ' m³'}</b><span>${st.length ? nf(st.reduce((a, r) => a + m3(r), 0), 1) + ' m³' : ''}${cm && st.length ? ` · ${nf(cm, 0)} m³ beton` : ''}</span>` : ''}</span>
       </summary>
       <div class="day-body">
         ${recs.length ? `
         <div><div class="sub-h">${t('perTruck')}</div><div class="per-truck">${Object.entries(per).sort((a, b) => b[1].n - a[1].n).map(([k, x]) => `
-          <div class="pt">${TRUCK}<span><b>${esc(k)}</b><small>${t('trips', x.n)}</small></span><span class="w">${x.stone ? nf(x.t, 1) + ' t' : nf(x.m3, 0) + ' m³'}</span></div>`).join('')}</div></div>
+          <div class="pt">${TRUCK}<span><b>${esc(k)}</b><small>${t('trips', x.n)}${x.miss ? ` <span style="color:var(--crit);font-weight:600">+ ${x.miss} ${t('legMiss')}</span>` : ''}</small></span><span class="w">${x.stone ? nf(x.t, 1) + ' t' : nf(x.m3, 0) + ' m³'}</span></div>`).join('')}</div></div>
         <div><div class="sub-h">${t('dayList')}</div><div class="tlist">${recs.map(r => `
           <details class="tdet">
-            <summary class="trow"><span class="tm">${esc(r.time || '')}</span>${TRUCK}<span class="pl">${esc(r.vehicle || '–')}<small>${esc(pName(r.productKey))} · ${esc(r.noteNo || '')}</small></span><span class="w">${amount(r)}</span></summary>
+            <summary class="trow"><span class="tm">${esc(r.time || '')}</span>${TRUCK}<span class="pl">${esc(r.vehicle || '–')}<small>${esc(pName(r.productKey))} · ${esc(r.noteNo || '')}</small></span><span class="w">${stIcon(recState(r))}${amount(r)}</span>${whyHTML(r)}</summary>
             <div class="tdet-b">
               ${r.grossKg ? `<div>${t('gross')} <span class="mono">${nf(r.grossKg)} kg</span> − ${t('tare')} <span class="mono">${nf(r.tareKg)} kg</span> = ${t('net')} <span class="mono">${nf(r.netKg)} kg</span>${r.tareAt ? ` · ${t('tare')}: ${esc(r.tareAt)}` : ''}</div>` : ''}
               <div>${r.ekaer ? 'EKÁER <span class="mono">' + esc(r.ekaer) + '</span>' : ''}${r.driver ? ' · ' + esc(r.driver) : ''}${r.waybillNo ? ' · ' + t('waybill').toLowerCase() + ' <span class="mono">' + esc(r.waybillNo) + '</span>' : ''}</div>
@@ -513,8 +569,8 @@ function drawDays(p){
               ${r.remark ? `<div class="rmk">${esc(r.remark)}</div>` : ''}
               ${r.docs.length ? thumbs(r.docs) : ''}
             </div>
-          </details>`).join('')}</div></div>` : ''}
-        ${iss.length ? `<div class="iss">${iss.map(issueHTML).join('')}</div>` : ''}
+          </details>`).join('')}${miss.map(missRowHTML).join('')}</div></div>` : (miss.length ? `<div class="tlist">${miss.map(missRowHTML).join('')}</div>` : '')}
+        ${dayNotes.length ? `<div class="iss">${dayNotes.map(issueHTML).join('')}</div>` : ''}
         ${wbs.length || pics.length ? `<details class="more"><summary>${t('moreH', wbs.length, pics.length)}</summary>
           <div style="display:flex;flex-direction:column;gap:8px">${wbs.map(wbHTML).join('')}${pics.length ? thumbs(pics) : ''}</div></details>` : ''}
       </div></details>`;
@@ -534,16 +590,22 @@ function wbHTML(w){
 }
 
 function issueHTML(i){
-  const c = i.status === 'open' ? sevClass(i.severity) : i.severity === 'info' ? 'info' : 'ok';
-  const lbl = i.status === 'closed' ? t('done') : t('sev')[c];
-  return `<div class="issue"><span class="sev ${c}">${esc(lbl)}</span><div>${esc(i.text)}<div class="d">${esc(i.date)}</div></div></div>`;
+  const c = i.status !== 'open' ? (i.status === 'closed' ? 'ok' : 'info') : i.affects === 'missing' ? 'crit' : i.affects === 'check' ? 'warn' : 'info';
+  const lbl = i.status === 'closed' ? t('done') : i.status !== 'open' ? 'Info' : i.affects === 'missing' ? t('grpMiss') : i.affects === 'check' ? t('nCheck', '').trim() : t('grpPaper');
+  return `<div class="issue"><span class="sev ${c}">${esc(lbl)}</span><div>${esc(i.short || i.text)}</div></div>`;
 }
 
 function drawIssues(p){
-  const open = D.issues.filter(i => i.status === 'open').sort((a, b) => (a.severity === 'err' ? 0 : 1) - (b.severity === 'err' ? 0 : 1) || b.date.localeCompare(a.date));
-  const rest = D.issues.filter(i => i.status !== 'open').sort((a, b) => b.date.localeCompare(a.date));
-  p.innerHTML = `<div class="sub-h">${t('issuesOpen')}</div><div class="iss">${open.map(issueHTML).join('') || `<div class="empty">${t('noIssues')}</div>`}</div>
-    <div class="sub-h" style="margin-top:22px">${t('issuesClosed')}</div><div class="iss">${rest.map(issueHTML).join('')}</div>`;
+  const item = i => `<div class="it"><div><div>${esc(i.short || i.text)}</div><div class="d">${i.date} · ${wd(i.date)}</div></div>
+    <button type="button" data-day="${i.date}">${t('goDay')}</button>${i.short && i.short !== i.text ? `<div class="long">${esc(i.text)}</div>` : ''}</div>`;
+  const grp = (cls, icon, h, sub, list) => list.length ? `<section class="grp"><h3><span class="st ${cls}">${icon}</span>${h} <span class="count ${cls === 'miss' ? 'crit' : ''}">${list.length}</span></h3><p>${sub}</p>${list.map(item).join('')}</section>` : '';
+  const byDate = (x, y) => y.date.localeCompare(x.date);
+  const rest = D.issues.filter(i => i.status !== 'open').sort(byDate);
+  p.innerHTML = grp('miss', '✕', t('grpMiss'), t('grpMissP'), openOf('missing').sort(byDate))
+    + grp('check', '!', t('grpCheck'), t('grpCheckP'), openOf('check').sort(byDate))
+    + grp('ok', '§', t('grpPaper'), t('grpPaperP'), openOf('paper').sort(byDate))
+    + `<details class="grp"><summary style="cursor:pointer;font-weight:600">${t('grpInfo')} (${rest.length})</summary><div style="margin-top:10px">${rest.map(item).join('')}</div></details>`;
+  p.querySelectorAll('[data-day]').forEach(b => b.onclick = () => setTab('days', b.dataset.day));
 }
 
 function allDocs(){
