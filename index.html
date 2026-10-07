@@ -236,6 +236,28 @@ select.chip{appearance:auto}
   .lock span{display:none}
   .top h1{font-size:28px}
 }
+.day-sum{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.day-sum b{font:800 26px/1 var(--display);font-stretch:112%;font-variant-numeric:tabular-nums}
+.day-sum span{color:var(--muted);font-size:13.5px}
+.per-truck{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.pt{display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--rule);border-radius:12px;background:var(--bg)}
+.pt svg{width:38px;color:var(--accent)}
+.pt b{font-weight:600;display:block;overflow-wrap:anywhere}
+.pt small{color:var(--muted);font-size:12.5px}
+.pt .w{font:700 17px/1 var(--mono);text-align:right}
+.tlist{border:1px solid var(--rule);border-radius:12px;background:var(--bg);padding:0 12px}
+.tdet>summary{list-style:none;cursor:pointer}
+.tdet>summary::-webkit-details-marker{display:none}
+.tdet:first-child>summary.trow{border-top:0}
+.tdet[open]>summary .w::after{content:' ▴';font-size:11px;color:var(--faint)}
+.tdet>summary .w::after{content:' ▾';font-size:11px;color:var(--faint)}
+.tdet-b{padding:2px 0 12px 62px;display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted)}
+.tdet-b .mono{color:var(--ink)}
+.tdet-b .rmk{color:var(--warn)}
+@media (max-width:520px){.tdet-b{padding-left:0}.per-truck{grid-template-columns:1fr}}
+.more{border-top:1px solid var(--rule);padding-top:10px}
+.more>summary{cursor:pointer;font-weight:600;color:var(--accent);padding:4px 0}
+.more[open]>summary{margin-bottom:10px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 .gate{max-width:380px;margin:12vh auto 0;background:var(--surface);border:1px solid var(--rule);border-radius:16px;box-shadow:var(--shadow);padding:24px;display:flex;flex-direction:column;gap:12px}
 .gate h2{font-size:22px;font-weight:800}
@@ -288,7 +310,7 @@ const T = {
   note:'Szállítólevél', waybill:'Fuvarlevél', own:'Sky Tech szállítólevél', photo:'Helyszíni fotó', all:'Mind', allDays:'Minden nap',
   sev:{crit:'Hiba',warn:'Ellenőrizni',ok:'Rendben',info:'Info'}, done:'lezárva', openFull:'Eredeti méret', close:'Bezár',
   loadedKm:'rakott km', totalKm:'össz. km', driver:'sofőr', start:'indulás', end:'vége', none:'Nincs a szűrésnek megfelelő dokumentum.',
-  cum:'összesen eddig', home:'Áttekintés', papers:'Papírok', arrived:'Megjött', stillNeed:'Még kell', ofOrd:'a rendelésből', fleetT:'Kamionok a rendelésből', fleetH:'Egy ikon = egy kamion kő (kb. 26 t)', legOn:'megjött', legNew:'legutóbbi nap', legOff:'még jön', lastDay:'Legutóbbi szállítás', todayW:'Ma', truckN:n=>`${n} kamion`, aboutT:n=>`≈ ${n} kamion`, seeDay:'Papírok és részletek', chartH:'Mennyi jött naponta', chartHint:'tonna kő naponként, a szám az oszlop tetején', mixH:'Milyen kő jött', gateT:'Kőszállítások – Szihalom', gateP:'Írd be a belépési kódot. Csak egyszer kell, a böngésző megjegyzi.', gateBtn:'Belépés', bad:'Hibás kód, próbáld újra.', noCrypto:'Ez a böngésző nem tudja megnyitni a védett oldalt. Nyisd meg Chrome-ban vagy Safariban.', logout:'Kilépés', opening:'Megnyitás…', unload:'lerakva', weighed:'mérve', issuesOpen:'Nyitott kérdések', issuesClosed:'Lezárt / információ', noIssues:'Nincs nyitott kérdés.' },
+  cum:'összesen eddig', perTruck:'Kamiononként', trips:n=>`${n} forduló`, tapRow:'Koppints egy sorra a részletekért és a papírokért.', moreH:(w,f)=>`Fuvarlevelek${w ? ` (${w})` : ''}${f ? ` és fotók (${f})` : ''}`, dayList:'Minden kamion aznap', home:'Áttekintés', papers:'Papírok', arrived:'Megjött', stillNeed:'Még kell', ofOrd:'a rendelésből', fleetT:'Kamionok a rendelésből', fleetH:'Egy ikon = egy kamion kő (kb. 26 t)', legOn:'megjött', legNew:'legutóbbi nap', legOff:'még jön', lastDay:'Legutóbbi szállítás', todayW:'Ma', truckN:n=>`${n} kamion`, aboutT:n=>`≈ ${n} kamion`, seeDay:'Papírok és részletek', chartH:'Mennyi jött naponta', chartHint:'tonna kő naponként, a szám az oszlop tetején', mixH:'Milyen kő jött', gateT:'Kőszállítások – Szihalom', gateP:'Írd be a belépési kódot. Csak egyszer kell, a böngésző megjegyzi.', gateBtn:'Belépés', bad:'Hibás kód, próbáld újra.', noCrypto:'Ez a böngésző nem tudja megnyitni a védett oldalt. Nyisd meg Chrome-ban vagy Safariban.', logout:'Kilépés', opening:'Megnyitás…', unload:'lerakva', weighed:'mérve', issuesOpen:'Nyitott kérdések', issuesClosed:'Lezárt / információ', noIssues:'Nincs nyitott kérdés.' },
  en:{ title:'Stone deliveries', sub:'Solarpro Technology · Sky Tech Line Kft. · quarry: Andezit-Bau Zrt., haulier: Kárpátok Építőipari Kft.',
   updated:'Updated', delivered:'crushed stone delivered to date', ofOrder:'of the ordered quantity', ordered:'ordered', remaining:'remaining',
   loads:'loads', days:'delivery days', trucks:'trucks', approx:n=>`≈ ${n} loads to go`, avg:a=>`average ${a} t per load`,
@@ -299,7 +321,7 @@ const T = {
   note:'Delivery note', waybill:'Waybill', own:'Sky Tech delivery note', photo:'Site photo', all:'All', allDays:'All days',
   sev:{crit:'Error',warn:'Check',ok:'OK',info:'Info'}, done:'closed', openFull:'Full size', close:'Close',
   loadedKm:'loaded km', totalKm:'total km', driver:'driver', start:'start', end:'end', none:'No documents match this filter.',
-  cum:'to date', home:'Overview', papers:'Papers', arrived:'Arrived', stillNeed:'Still to come', ofOrd:'of the order', fleetT:'Trucks in the order', fleetH:'One icon = one truck of stone (about 26 t)', legOn:'arrived', legNew:'latest day', legOff:'still to come', lastDay:'Latest delivery', todayW:'Today', truckN:n=>`${n} trucks`, aboutT:n=>`≈ ${n} trucks`, seeDay:'Papers and details', chartH:'How much came each day', chartHint:'tonnes of stone per day, value on top of each bar', mixH:'Which stone came', gateT:'Stone deliveries – Szihalom', gateP:'Enter the access code. You only need to do this once; the browser remembers it.', gateBtn:'Open', bad:'Wrong code, try again.', noCrypto:'This browser cannot open the protected page. Use Chrome or Safari.', logout:'Log out', opening:'Opening…', unload:'unloaded', weighed:'weighed', issuesOpen:'Open questions', issuesClosed:'Closed / information', noIssues:'No open questions.' }
+  cum:'to date', perTruck:'Per truck', trips:n=>`${n} ${n === 1 ? 'trip' : 'trips'}`, tapRow:'Tap a row for details and papers.', moreH:(w,f)=>`Waybills${w ? ` (${w})` : ''}${f ? ` and photos (${f})` : ''}`, dayList:'Every truck that day', home:'Overview', papers:'Papers', arrived:'Arrived', stillNeed:'Still to come', ofOrd:'of the order', fleetT:'Trucks in the order', fleetH:'One icon = one truck of stone (about 26 t)', legOn:'arrived', legNew:'latest day', legOff:'still to come', lastDay:'Latest delivery', todayW:'Today', truckN:n=>`${n} trucks`, aboutT:n=>`≈ ${n} trucks`, seeDay:'Papers and details', chartH:'How much came each day', chartHint:'tonnes of stone per day, value on top of each bar', mixH:'Which stone came', gateT:'Stone deliveries – Szihalom', gateP:'Enter the access code. You only need to do this once; the browser remembers it.', gateBtn:'Open', bad:'Wrong code, try again.', noCrypto:'This browser cannot open the protected page. Use Chrome or Safari.', logout:'Log out', opening:'Opening…', unload:'unloaded', weighed:'weighed', issuesOpen:'Open questions', issuesClosed:'Closed / information', noIssues:'No open questions.' }
 };
 let L = 'hu', D = null, tab = 'home', openDay = null, docKind = 'all', docDay = 'all', LB = {list:[], i:0};
 try { const s = localStorage.getItem('szk-lang'); if (s === 'en' || s === 'hu') L = s; const tb = localStorage.getItem('szk-tab'); if (tb) tab = tb; } catch (e) {}
@@ -460,36 +482,41 @@ function thumbs(docs){
 function drawDays(p){
   const dates = [...new Set([...D.records.map(sd), ...D.waybills.map(w => w.date), ...D.photos.map(x => x.date), ...D.issues.map(i => i.date)])].sort().reverse();
   const latest = [...new Set(D.records.map(sd))].sort().pop();
-  p.innerHTML = dates.map(d => {
+  const amount = r => isStone(r) ? nf(tonnes(r), 1) + ' t' : nf(r.qty, 1) + ' m³';
+  p.innerHTML = `<p class="muted" style="margin:0 0 12px;color:var(--muted);font-size:13.5px">${t('tapRow')}</p>` + dates.map(d => {
     const recs = D.records.filter(r => sd(r) === d).sort((a, b) => (a.time || '').localeCompare(b.time || ''));
     const wbs = D.waybills.filter(w => w.date === d), pics = D.photos.filter(x => x.date === d), iss = D.issues.filter(i => i.date === d);
     const st = recs.filter(isStone), tn = st.reduce((a, r) => a + tonnes(r), 0), cm = recs.filter(r => !isStone(r)).reduce((a, r) => a + (r.qty || 0), 0);
-    const nDocs = recs.reduce((a, r) => a + r.docs.length, 0) + wbs.reduce((a, w) => a + w.docs.length, 0) + pics.length;
     const openN = iss.filter(i => i.status === 'open'), crit = openN.some(i => i.severity === 'err');
+    // per truck: tractor plate -> trips + amount
+    const per = {};
+    recs.forEach(r => { const k = r.vehicle || '–', x = per[k] ||= {n:0, t:0, m3:0, stone:isStone(r)}; x.n++; if (isStone(r)) x.t += tonnes(r); else x.m3 += r.qty || 0; });
     return `<details class="day" data-d="${d}" ${d === (openDay || latest) ? 'open' : ''}>
       <summary>
         <span class="chev" aria-hidden="true">▸</span>
-        <span style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;min-width:0"><span class="day-date">${d.slice(5).replace('-', '.')}.<small>${d.slice(0, 4)} · ${wd(d)}</small></span>
-          <span class="day-meta">${recs.length ? `<span class="pill">${st.length} ${t('loads')}</span>` : `<span class="pill">${t('noDel')}</span>`}
-          ${nDocs ? `<span class="pill">${nDocs} ${t('docs')}</span>` : ''}
+        <span style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;min-width:0"><span class="day-date">${d.slice(5).replace('-', '.')}.<small>${d.slice(0, 4)} · ${wd(d)}</small></span>
+          <span class="day-meta">${recs.length ? `<span class="pill">${t('truckN', recs.length)}</span>` : `<span class="pill">${t('noDel')}</span>`}
           ${openN.length ? `<span class="pill ${crit ? 'crit' : 'warn'}">${openN.length} ${t('open')}</span>` : ''}</span></span>
-        <span class="day-t">${recs.length ? `<b>${nf(tn, 2)} t</b><span>${nf(st.reduce((a, r) => a + m3(r), 0), 1)} m³${cm ? ` · ${nf(cm, 0)} m³ beton` : ''}</span>` : ''}</span>
+        <span class="day-t">${recs.length ? `<b>${st.length ? nf(tn, 1) + ' t' : nf(cm, 0) + ' m³'}</b><span>${st.length ? nf(st.reduce((a, r) => a + m3(r), 0), 1) + ' m³' : ''}${cm && st.length ? ` · ${nf(cm, 0)} m³ beton` : ''}</span>` : ''}</span>
       </summary>
       <div class="day-body">
+        ${recs.length ? `
+        <div><div class="sub-h">${t('perTruck')}</div><div class="per-truck">${Object.entries(per).sort((a, b) => b[1].n - a[1].n).map(([k, x]) => `
+          <div class="pt">${TRUCK}<span><b>${esc(k)}</b><small>${t('trips', x.n)}</small></span><span class="w">${x.stone ? nf(x.t, 1) + ' t' : nf(x.m3, 0) + ' m³'}</span></div>`).join('')}</div></div>
+        <div><div class="sub-h">${t('dayList')}</div><div class="tlist">${recs.map(r => `
+          <details class="tdet">
+            <summary class="trow"><span class="tm">${esc(r.time || '')}</span>${TRUCK}<span class="pl">${esc(r.vehicle || '–')}<small>${esc(pName(r.productKey))} · ${esc(r.noteNo || '')}</small></span><span class="w">${amount(r)}</span></summary>
+            <div class="tdet-b">
+              ${r.grossKg ? `<div>${t('gross')} <span class="mono">${nf(r.grossKg)} kg</span> − ${t('tare')} <span class="mono">${nf(r.tareKg)} kg</span> = ${t('net')} <span class="mono">${nf(r.netKg)} kg</span>${r.tareAt ? ` · ${t('tare')}: ${esc(r.tareAt)}` : ''}</div>` : ''}
+              <div>${r.ekaer ? 'EKÁER <span class="mono">' + esc(r.ekaer) + '</span>' : ''}${r.driver ? ' · ' + esc(r.driver) : ''}${r.waybillNo ? ' · ' + t('waybill').toLowerCase() + ' <span class="mono">' + esc(r.waybillNo) + '</span>' : ''}</div>
+              ${r.deliveredOn && r.deliveredOn !== r.date ? `<div><span class="pill warn">${t('weighed')} ${esc(r.date)} · ${t('unload')} ${esc(r.deliveredOn)}</span></div>` : ''}
+              ${r.remark ? `<div class="rmk">${esc(r.remark)}</div>` : ''}
+              ${r.docs.length ? thumbs(r.docs) : ''}
+            </div>
+          </details>`).join('')}</div></div>` : ''}
         ${iss.length ? `<div class="iss">${iss.map(issueHTML).join('')}</div>` : ''}
-        ${recs.length ? `<div><div class="sub-h">${t('loadsH')}</div><div class="loads">${recs.map(r => `
-          <div class="load">
-            <span class="tm">${esc(r.time || '')}</span>
-            <span class="who"><b>${esc(r.vehicle || '–')}</b> · ${esc(pName(r.productKey))}
-              <div>${esc(r.noteNo || '')}${r.ekaer ? ' · EKÁER ' + esc(r.ekaer) : ''}${r.driver ? ' · ' + esc(r.driver) : ''}${r.waybillNo ? ' · ' + t('waybill').toLowerCase() + ' ' + esc(r.waybillNo) : ''}</div>
-              ${r.grossKg ? `<div class="mono">${t('gross')} ${nf(r.grossKg)} · ${t('tare')} ${nf(r.tareKg)} kg${r.tareAt ? ` (${esc(r.tareAt)})` : ''}</div>` : ''}
-              ${r.deliveredOn && r.deliveredOn !== r.date ? `<div><span class="pill warn">${t('weighed')} ${esc(r.date)} · ${t('unload')} ${esc(r.deliveredOn)}</span></div>` : ''}</span>
-            <span class="net">${isStone(r) ? nf(tonnes(r), 2) + ' t' : nf(r.qty, 1) + ' m³'}<small>${t('net')}${isStone(r) ? ' · ' + nf(m3(r), 1) + ' m³' : ''}</small></span>
-            ${r.remark ? `<div class="rmk">${esc(r.remark)}</div>` : ''}
-            ${r.docs.length ? `<div class="thumbs-wrap" style="grid-column:2/-1">${thumbs(r.docs)}</div>` : ''}
-          </div>`).join('')}</div></div>` : ''}
-        ${wbs.length ? `<div><div class="sub-h">${t('wbH')}</div><div style="display:flex;flex-direction:column;gap:8px">${wbs.map(wbHTML).join('')}</div></div>` : ''}
-        ${pics.length ? `<div><div class="sub-h">${t('photo')}</div>${thumbs(pics)}</div>` : ''}
+        ${wbs.length || pics.length ? `<details class="more"><summary>${t('moreH', wbs.length, pics.length)}</summary>
+          <div style="display:flex;flex-direction:column;gap:8px">${wbs.map(wbHTML).join('')}${pics.length ? thumbs(pics) : ''}</div></details>` : ''}
       </div></details>`;
   }).join('');
   bindThumbs(p); lazyImgs(p);
