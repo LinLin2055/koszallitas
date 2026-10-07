@@ -658,7 +658,7 @@ function setLang(l){ L = l; try { localStorage.setItem('szk-lang', l); } catch (
 $('#lang-hu').onclick = () => setLang('hu'); $('#lang-en').onclick = () => setLang('en');
 
 /* ---------- access code + decryption (PBKDF2-SHA256 -> AES-GCM-256; every file is IV(12) + ciphertext) ---------- */
-const ENC = {"salt": "h2OX1OOwPI4cHSPNHikZ+w==", "iter": 300000};
+const ENC = {"salt": "BzWlxW4CMiMfFM1Rp3qrEA==", "iter": 300000};
 const LS_CODE = 'szk-code';
 const b64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
 let KEY = null; const URLS = {};
