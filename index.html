@@ -658,13 +658,14 @@ function setLang(l){ L = l; try { localStorage.setItem('szk-lang', l); } catch (
 $('#lang-hu').onclick = () => setLang('hu'); $('#lang-en').onclick = () => setLang('en');
 
 /* ---------- access code + decryption (PBKDF2-SHA256 -> AES-GCM-256; every file is IV(12) + ciphertext) ---------- */
-const ENC = {"salt": "BzWlxW4CMiMfFM1Rp3qrEA==", "iter": 300000};
+const ENC = [{"role": "office", "label": "Iroda / Office", "salt": "ZH8EUmXUEbRNc/bQ8gG2jg==", "iter": 300000, "data": "data_office.enc"}, {"role": "supplier", "label": "Sz\u00e1ll\u00edt\u00f3 / Supplier", "salt": "04imuU6irtkH/cOR6QGPlw==", "iter": 300000, "data": "data_supplier.enc"}, {"role": "client", "label": "Megrendel\u0151 / Client", "salt": "TACNjhrifeGgXM4qmeT60w==", "iter": 300000, "data": "data_client.enc"}];
 const LS_CODE = 'szk-code';
 const b64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
 let KEY = null; const URLS = {};
-async function deriveKey(code){
+let ROLE = null;
+async function deriveKey(code, salt, iter){
   const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(code), 'PBKDF2', false, ['deriveKey']);
-  return crypto.subtle.deriveKey({name:'PBKDF2', salt:b64(ENC.salt), iterations:ENC.iter, hash:'SHA-256'}, base, {name:'AES-GCM', length:256}, false, ['decrypt']);
+  return crypto.subtle.deriveKey({name:'PBKDF2', salt:b64(salt), iterations:iter, hash:'SHA-256'}, base, {name:'AES-GCM', length:256}, false, ['decrypt']);
 }
 async function getFile(path){
   const r = await fetch(path, {cache:'no-cache'}); if (!r.ok) throw new Error(path + ': ' + r.status);
@@ -692,15 +693,26 @@ async function start(){
   let code = null; try { code = localStorage.getItem(LS_CODE); } catch (e) {}
   if (ENC && !code) code = await gate();
   for (;;){
-    try {
-      if (ENC) KEY = await deriveKey(code);
-      D = JSON.parse(new TextDecoder().decode(await getFile('data.enc')));
-      break;
-    } catch (e){
-      if (e.name !== 'OperationError'){ $('#app').innerHTML = `<div class="skeleton">${esc(e.message)}</div>`; return; }
-      try { localStorage.removeItem(LS_CODE); } catch (x) {}
-      code = await gate(t('bad'));
+    if (!ENC){ D = JSON.parse(new TextDecoder().decode(await getFile('data.json'))); break; }
+    let hit = null, fatal = null;
+    for (const r of ENC){                       // one code per role; try each until one opens
+      try {
+        KEY = await deriveKey(code, r.salt, r.iter);
+        D = JSON.parse(new TextDecoder().decode(await getFile(r.data)));
+        hit = r; break;
+      } catch (e){ if (e.name !== 'OperationError') fatal = e; }
     }
+    if (hit){ ROLE = hit; break; }
+    if (fatal){ $('#app').innerHTML = `<div class="skeleton">${esc(fatal.message)}</div>`; return; }
+    try { localStorage.removeItem(LS_CODE); } catch (x) {}
+    code = await gate(t('bad'));
+  }
+  if (ROLE){
+    document.title = document.title + ' – ' + ROLE.label;
+    const b = document.createElement('span');
+    b.textContent = ROLE.label;
+    b.style.cssText = 'font-size:.72rem;font-weight:700;letter-spacing:.03em;padding:.25em .7em;border-radius:999px;background:#1F3864;color:#fff;margin-right:.5rem;white-space:nowrap';
+    $('#logout').insertAdjacentElement('beforebegin', b);
   }
   try { if (ENC) localStorage.setItem(LS_CODE, code); } catch (e) {}
   $('#logout').hidden = !ENC; render();
