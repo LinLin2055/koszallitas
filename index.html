@@ -297,6 +297,32 @@ select.chip{appearance:auto}
 .gate button{border:0;border-radius:10px;padding:12px;background:var(--accent);color:var(--surface);font-weight:600}
 .gate .err{color:var(--crit);font-size:13px;min-height:18px}
 .lock{border:1px solid var(--rule);background:var(--surface);border-radius:999px;padding:6px 10px;font-size:12px;color:var(--muted)}
+/* table tab */
+.tbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.tbar .seg button{padding:8px 14px;font-size:13px}
+.xl{border:0;border-radius:10px;padding:9px 14px;background:var(--ok);color:var(--surface);font-weight:600;display:inline-flex;align-items:center;gap:8px}
+.xl svg{width:18px;height:18px}
+.xl[disabled]{opacity:.65;cursor:progress}
+.xl-err{color:var(--crit);font-size:13px;flex-basis:100%;text-align:right}
+.tscroll{overflow-x:auto;background:var(--surface);border:1px solid var(--rule);border-radius:14px}
+table.dt{border-collapse:collapse;width:100%;font-size:13.5px}
+.dt th,.dt td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--rule);white-space:nowrap;vertical-align:top}
+.dt td{background:var(--surface)}
+.dt td:first-child,.dt th:first-child{position:sticky;left:0;z-index:1}
+.dt tr:not(.dh) td:first-child,.dt th:first-child{box-shadow:1px 0 0 var(--rule)}
+.dt thead th{background:var(--sunk);font:600 11px/1.25 var(--body);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);white-space:normal;vertical-align:bottom}
+.dt .n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.dt tr.dh td{background:var(--accent-soft);font-weight:600;padding-top:10px}
+.dt tr.dh td span{font-weight:400;color:var(--muted);margin-left:8px}
+.dt tr.sub td{background:var(--bg);font-weight:600}
+.dt tr.tot td{background:var(--accent);color:var(--surface);font-weight:700;border-bottom:0}
+.dt tr.miss td{background:var(--crit-bg);color:var(--crit)}
+.dt tr.click{cursor:pointer}
+.dt tr.click:hover td{background:var(--accent-soft)}
+.dt td.rm{white-space:normal;min-width:220px;max-width:420px;font-size:12.5px;color:var(--muted)}
+.dt tr.miss td.rm{color:var(--crit)}
+.dt .stc{display:inline-flex;align-items:center;gap:6px}
+.tnote{font-size:12.5px;color:var(--muted);margin:8px 2px 0}
 </style>
 </head>
 <body>
@@ -304,7 +330,7 @@ select.chip{appearance:auto}
 <div class="wrap">
   <header class="top">
     <div>
-      <div class="eyebrow" id="eyebrow">Szihalom BESS · Andezit-Bau Recsk → Szihalom</div>
+      <div class="eyebrow" id="eyebrow">Szihalom BESS</div>
       <h1 id="title">Kőszállítások</h1>
       <div class="sub" id="sub"></div>
     </div>
@@ -331,32 +357,32 @@ select.chip{appearance:auto}
 <script>
 'use strict';
 const T = {
- hu:{ title:'Kőszállítások', sub:'Solarpro Technology · Sky Tech Line Kft. · szállító: Andezit-Bau Zrt., fuvarozó: Kárpátok Építőipari Kft.',
+ hu:{ title:'Kőszállítások', quarryL:'szállító', carrierL:'fuvarozó',
   updated:'Frissítve', delivered:'zúzottkő leszállítva eddig', ofOrder:'a megrendelt mennyiségből', ordered:'megrendelve', remaining:'hátralévő',
   loads:'forduló', days:'szállítási nap', trucks:'kamion', approx:n=>`≈ ${n} forduló van hátra`, avg:a=>`átlag ${a} t / forduló`,
   daily:'Napi leszállított mennyiség', dailyNote:'tonna zúzottkő szállítási naponként', mix:'Termékek szerint', concrete:'Sovány beton CKT-4R',
-  tDays:'Napok', tDocs:'Dokumentumok', tIssues:'Teendők', open:'nyitott',
+  tDays:'Napok', tTable:'Táblázat', vSum:'Napi összesítő', vDet:'Szállításonként', xl:'Excel letöltése', xlBusy:'Készül…', xlErr:'Az Excel-fájl nem készült el. Van internet?', cDate:'Dátum', cDay:'Nap', cLoads:'Fordulók', cTime:'Idő', cTruck:'Rendszám', cProduct:'Termék', cNote:'Szállítólevél', cOwn:'Sky Tech szállítólevél', cTicket:'Mérlegjegy', cGross:'Bruttó (kg)', cTare:'Tára (kg)', cNet:'Nettó (t)', cM3:'Kő (m³)', cConc:'Beton (m³)', cWb:'Fuvarlevél', cDriver:'Sofőr', cSt:'Állapot', cRmk:'Megjegyzés', cCumT:'Összesen eddig (t)', cCumM3:'Összesen eddig (m³)', cPct:'Rendelésből', cMiss:'Nincs papír', daySum:'Napi összesen', grand:'Mindösszesen', stOkW:'Rendben', stCheckW:'Ellenőrizni', stMissW:'NINCS BESZÁMOLVA', xlTitle:'Kőszállítások', xlS1:'Napi összesítő', xlS2:'Szállítások naponként', xlS3:'Lista (szűrhető)', exported:'Exportálva', tblHint:'Kattints egy napra a fordulóiért.', xlFile:'Szihalom_koszallitas', tDocs:'Dokumentumok', tIssues:'Teendők', open:'nyitott',
   wd:['vasárnap','hétfő','kedd','szerda','csütörtök','péntek','szombat'], noDel:'nem volt szállítás',
   loadsH:'Szállítások', wbH:'Fuvarlevelek', issH:'Megjegyzések', docs:'dokumentum', net:'nettó', gross:'bruttó', tare:'tára',
   note:'Szállítólevél', waybill:'Fuvarlevél', own:'Sky Tech szállítólevél', photo:'Helyszíni fotó', all:'Mind', allDays:'Minden nap',
   sev:{crit:'Hiba',warn:'Ellenőrizni',ok:'Rendben',info:'Info'}, done:'lezárva', openFull:'Eredeti méret', close:'Bezár',
   loadedKm:'rakott km', totalKm:'össz. km', driver:'sofőr', start:'indulás', end:'vége', none:'Nincs a szűrésnek megfelelő dokumentum.',
-  cum:'összesen eddig', stOk:'Beszámolva, rendben', stCheck:'Beszámolva, de ellenőrizni kell (az ok a sor alatt)', stMiss:'NINCS beszámolva – megjött, de nincs róla papír', keysH:'Mit jelentenek a jelek?', missRow:'Hiányzó szállítólevél', allOk:'✓ minden beszámolva', nMiss:n=>`${n} nincs beszámolva`, nCheck:n=>`${n} ellenőrizni`, paperH:'Papírmunka (a mennyiséget nem érinti)', infoH:'Információ', grpMiss:'Nincs beszámolva', grpMissP:'Ezek a fordulók megtörténtek, de nincs róluk szállítólevél, ezért NINCSENEK benne a számokban. Kérjük el a papírt a sofőrtől / Kárpátoktól.', grpCheck:'Beszámolva, de ellenőrizni kell', grpCheckP:'Benne vannak a számokban, de valami nem stimmel a papíron.', grpPaper:'Papírmunka', grpPaperP:'Számlázási / adminisztratív kérdés, a leszállított kő mennyiségét nem érinti.', grpInfo:'Információ, lezárt ügyek', goDay:'Nap →', alertMiss:n=>`${n} kamion nincs beszámolva`, alertMissP:'Megjött, de nincs róla szállítólevél, ezért nincs benne a számokban.', alertCheck:n=>`${n} szállítás beszámolva, de ellenőrizni kell`, alertCheckP:'Benne vannak a számokban. Részletek a Teendők fülön.', legMiss:'nincs papír', estT:t=>`kb. ${t} t, nincs beszámolva`, perTruck:'Kamiononként', trips:n=>`${n} forduló`, tapRow:'Koppints egy sorra a részletekért és a papírokért.', moreH:(w,f)=>`Fuvarlevelek${w ? ` (${w})` : ''}${f ? ` és fotók (${f})` : ''}`, dayList:'Minden kamion aznap', home:'Áttekintés', papers:'Papírok', arrived:'Megjött', stillNeed:'Még kell', ofOrd:'a rendelésből', fleetT:'Kamionok a rendelésből', fleetH:'Egy ikon = egy kamion kő (kb. 26 t)', legOn:'megjött', legNew:'legutóbbi nap', legOff:'még jön', lastDay:'Legutóbbi szállítás', todayW:'Ma', truckN:n=>`${n} kamion`, aboutT:n=>`≈ ${n} kamion`, seeDay:'Papírok és részletek', chartH:'Mennyi jött naponta', chartHint:'tonna kő naponként, a szám az oszlop tetején', mixH:'Milyen kő jött', gateT:'Kőszállítások – Szihalom', gateP:'Írd be a belépési kódot. Csak egyszer kell, a böngésző megjegyzi.', gateBtn:'Belépés', bad:'Hibás kód, próbáld újra.', noCrypto:'Ez a böngésző nem tudja megnyitni a védett oldalt. Nyisd meg Chrome-ban vagy Safariban.', logout:'Kilépés', opening:'Megnyitás…', unload:'lerakva', weighed:'mérve', issuesOpen:'Nyitott kérdések', issuesClosed:'Lezárt / információ', noIssues:'Nincs nyitott kérdés.' },
- en:{ title:'Stone deliveries', sub:'Solarpro Technology · Sky Tech Line Kft. · quarry: Andezit-Bau Zrt., haulier: Kárpátok Építőipari Kft.',
+  cum:'összesen eddig', stOk:'Beszámolva, rendben', stCheck:'Beszámolva, de ellenőrizni kell (az ok a sor alatt)', stMiss:'NINCS beszámolva – megjött, de nincs róla papír', keysH:'Mit jelentenek a jelek?', missRow:'Hiányzó szállítólevél', allOk:'✓ minden beszámolva', nMiss:n=>`${n} nincs beszámolva`, nCheck:n=>`${n} ellenőrizni`, paperH:'Papírmunka (a mennyiséget nem érinti)', infoH:'Információ', grpMiss:'Nincs beszámolva', grpMissP:'Ezek a fordulók megtörténtek, de nincs róluk szállítólevél, ezért NINCSENEK benne a számokban. Kérjük el a papírt a sofőrtől / a fuvarozótól.', grpCheck:'Beszámolva, de ellenőrizni kell', grpCheckP:'Benne vannak a számokban, de valami nem stimmel a papíron.', grpPaper:'Papírmunka', grpPaperP:'Számlázási / adminisztratív kérdés, a leszállított kő mennyiségét nem érinti.', grpInfo:'Információ, lezárt ügyek', goDay:'Nap →', alertMiss:n=>`${n} kamion nincs beszámolva`, alertMissP:'Megjött, de nincs róla szállítólevél, ezért nincs benne a számokban.', alertCheck:n=>`${n} szállítás beszámolva, de ellenőrizni kell`, alertCheckP:'Benne vannak a számokban. Részletek a Teendők fülön.', legMiss:'nincs papír', estT:t=>`kb. ${t} t, nincs beszámolva`, perTruck:'Kamiononként', trips:n=>`${n} forduló`, tapRow:'Koppints egy sorra a részletekért és a papírokért.', moreH:(w,f)=>`Fuvarlevelek${w ? ` (${w})` : ''}${f ? ` és fotók (${f})` : ''}`, dayList:'Minden kamion aznap', home:'Áttekintés', papers:'Papírok', arrived:'Megjött', stillNeed:'Még kell', ofOrd:'a rendelésből', fleetT:'Kamionok a rendelésből', fleetH:'Egy ikon = egy kamion kő (kb. 26 t)', legOn:'megjött', legNew:'legutóbbi nap', legOff:'még jön', lastDay:'Legutóbbi szállítás', todayW:'Ma', truckN:n=>`${n} kamion`, aboutT:n=>`≈ ${n} kamion`, seeDay:'Papírok és részletek', chartH:'Mennyi jött naponta', chartHint:'tonna kő naponként, a szám az oszlop tetején', mixH:'Milyen kő jött', gateT:'Kőszállítások – Szihalom', gateP:'Írd be a belépési kódot. Csak egyszer kell, a böngésző megjegyzi.', gateBtn:'Belépés', bad:'Hibás kód, próbáld újra.', noCrypto:'Ez a böngésző nem tudja megnyitni a védett oldalt. Nyisd meg Chrome-ban vagy Safariban.', logout:'Kilépés', opening:'Megnyitás…', unload:'lerakva', weighed:'mérve', issuesOpen:'Nyitott kérdések', issuesClosed:'Lezárt / információ', noIssues:'Nincs nyitott kérdés.' },
+ en:{ title:'Stone deliveries', quarryL:'quarry', carrierL:'haulier',
   updated:'Updated', delivered:'crushed stone delivered to date', ofOrder:'of the ordered quantity', ordered:'ordered', remaining:'remaining',
   loads:'loads', days:'delivery days', trucks:'trucks', approx:n=>`≈ ${n} loads to go`, avg:a=>`average ${a} t per load`,
   daily:'Delivered per day', dailyNote:'tonnes of crushed stone per delivery day', mix:'By product', concrete:'Lean concrete CKT-4R',
-  tDays:'Days', tDocs:'Documents', tIssues:'To do', open:'open',
+  tDays:'Days', tTable:'Table', vSum:'Daily summary', vDet:'Every load', xl:'Download Excel', xlBusy:'Preparing…', xlErr:'Could not build the Excel file. Are you online?', cDate:'Date', cDay:'Day', cLoads:'Loads', cTime:'Time', cTruck:'Truck', cProduct:'Product', cNote:'Delivery note', cOwn:'Sky Tech delivery note', cTicket:'Weighbridge ticket', cGross:'Gross (kg)', cTare:'Tare (kg)', cNet:'Net (t)', cM3:'Stone (m³)', cConc:'Concrete (m³)', cWb:'Waybill', cDriver:'Driver', cSt:'Status', cRmk:'Remark', cCumT:'To date (t)', cCumM3:'To date (m³)', cPct:'Of order', cMiss:'No paper', daySum:'Day total', grand:'Grand total', stOkW:'OK', stCheckW:'Check', stMissW:'NOT COUNTED', xlTitle:'Stone deliveries', xlS1:'Daily summary', xlS2:'Deliveries by day', xlS3:'List (filterable)', exported:'Exported', tblHint:'Click a day to see its loads.', xlFile:'Szihalom_stone_deliveries', tDocs:'Documents', tIssues:'To do', open:'open',
   wd:['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'], noDel:'no deliveries',
   loadsH:'Deliveries', wbH:'Waybills', issH:'Notes', docs:'documents', net:'net', gross:'gross', tare:'tare',
   note:'Delivery note', waybill:'Waybill', own:'Sky Tech delivery note', photo:'Site photo', all:'All', allDays:'All days',
   sev:{crit:'Error',warn:'Check',ok:'OK',info:'Info'}, done:'closed', openFull:'Full size', close:'Close',
   loadedKm:'loaded km', totalKm:'total km', driver:'driver', start:'start', end:'end', none:'No documents match this filter.',
-  cum:'to date', stOk:'Counted, all fine', stCheck:'Counted, but needs checking (reason under the row)', stMiss:'NOT counted – arrived, but there is no paper', keysH:'What the marks mean', missRow:'Missing delivery note', allOk:'✓ all counted', nMiss:n=>`${n} not counted`, nCheck:n=>`${n} to check`, paperH:'Paperwork (does not change the quantity)', infoH:'Information', grpMiss:'Not counted', grpMissP:'These loads were delivered but have no delivery note, so they are NOT in the totals. Ask the driver / Kárpátok for the paper.', grpCheck:'Counted, but needs checking', grpCheckP:'They are in the totals, but something on the paper is off.', grpPaper:'Paperwork', grpPaperP:'Billing / admin questions; the quantity of stone delivered is not affected.', grpInfo:'Information, closed items', goDay:'Day →', alertMiss:n=>`${n} truck not counted`, alertMissP:'It arrived, but there is no delivery note, so it is not in the totals.', alertCheck:n=>`${n} deliveries counted but need checking`, alertCheckP:'They are in the totals. Details on the To do tab.', legMiss:'no paper', estT:t=>`about ${t} t, not counted`, perTruck:'Per truck', trips:n=>`${n} ${n === 1 ? 'trip' : 'trips'}`, tapRow:'Tap a row for details and papers.', moreH:(w,f)=>`Waybills${w ? ` (${w})` : ''}${f ? ` and photos (${f})` : ''}`, dayList:'Every truck that day', home:'Overview', papers:'Papers', arrived:'Arrived', stillNeed:'Still to come', ofOrd:'of the order', fleetT:'Trucks in the order', fleetH:'One icon = one truck of stone (about 26 t)', legOn:'arrived', legNew:'latest day', legOff:'still to come', lastDay:'Latest delivery', todayW:'Today', truckN:n=>`${n} trucks`, aboutT:n=>`≈ ${n} trucks`, seeDay:'Papers and details', chartH:'How much came each day', chartHint:'tonnes of stone per day, value on top of each bar', mixH:'Which stone came', gateT:'Stone deliveries – Szihalom', gateP:'Enter the access code. You only need to do this once; the browser remembers it.', gateBtn:'Open', bad:'Wrong code, try again.', noCrypto:'This browser cannot open the protected page. Use Chrome or Safari.', logout:'Log out', opening:'Opening…', unload:'unloaded', weighed:'weighed', issuesOpen:'Open questions', issuesClosed:'Closed / information', noIssues:'No open questions.' }
+  cum:'to date', stOk:'Counted, all fine', stCheck:'Counted, but needs checking (reason under the row)', stMiss:'NOT counted – arrived, but there is no paper', keysH:'What the marks mean', missRow:'Missing delivery note', allOk:'✓ all counted', nMiss:n=>`${n} not counted`, nCheck:n=>`${n} to check`, paperH:'Paperwork (does not change the quantity)', infoH:'Information', grpMiss:'Not counted', grpMissP:'These loads were delivered but have no delivery note, so they are NOT in the totals. Ask the driver / the haulier for the paper.', grpCheck:'Counted, but needs checking', grpCheckP:'They are in the totals, but something on the paper is off.', grpPaper:'Paperwork', grpPaperP:'Billing / admin questions; the quantity of stone delivered is not affected.', grpInfo:'Information, closed items', goDay:'Day →', alertMiss:n=>`${n} truck not counted`, alertMissP:'It arrived, but there is no delivery note, so it is not in the totals.', alertCheck:n=>`${n} deliveries counted but need checking`, alertCheckP:'They are in the totals. Details on the To do tab.', legMiss:'no paper', estT:t=>`about ${t} t, not counted`, perTruck:'Per truck', trips:n=>`${n} ${n === 1 ? 'trip' : 'trips'}`, tapRow:'Tap a row for details and papers.', moreH:(w,f)=>`Waybills${w ? ` (${w})` : ''}${f ? ` and photos (${f})` : ''}`, dayList:'Every truck that day', home:'Overview', papers:'Papers', arrived:'Arrived', stillNeed:'Still to come', ofOrd:'of the order', fleetT:'Trucks in the order', fleetH:'One icon = one truck of stone (about 26 t)', legOn:'arrived', legNew:'latest day', legOff:'still to come', lastDay:'Latest delivery', todayW:'Today', truckN:n=>`${n} trucks`, aboutT:n=>`≈ ${n} trucks`, seeDay:'Papers and details', chartH:'How much came each day', chartHint:'tonnes of stone per day, value on top of each bar', mixH:'Which stone came', gateT:'Stone deliveries – Szihalom', gateP:'Enter the access code. You only need to do this once; the browser remembers it.', gateBtn:'Open', bad:'Wrong code, try again.', noCrypto:'This browser cannot open the protected page. Use Chrome or Safari.', logout:'Log out', opening:'Opening…', unload:'unloaded', weighed:'weighed', issuesOpen:'Open questions', issuesClosed:'Closed / information', noIssues:'No open questions.' }
 };
 let L = 'hu', D = null, tab = 'home', openDay = null, docKind = 'all', docDay = 'all', LB = {list:[], i:0};
 try { const s = localStorage.getItem('szk-lang'); if (s === 'en' || s === 'hu') L = s; const tb = localStorage.getItem('szk-tab'); if (tb) tab = tb; } catch (e) {}
-if (['home','days','docs','issues'].includes(location.hash.slice(1))) tab = location.hash.slice(1);
+if (['home','days','table','docs','issues'].includes(location.hash.slice(1))) tab = location.hash.slice(1);
 const t = (k, ...a) => { const v = T[L][k]; return typeof v === 'function' ? v(...a) : v; };
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -385,6 +411,16 @@ function missRowHTML(x){
     <span class="why miss">✕ ${esc(t('estT', nf(x.estT, 1)))}. ${esc(x.reason)}</span></div>`;
 }
 
+/* header lines come from the role's own payload: the client's has no quarry / carrier, so it names neither */
+function subLine(){
+  const p = D.project || {};
+  return [p.client, p.contractor].filter(Boolean).join(' · ') + (p.quarry ? ` · ${t('quarryL')}: ${p.quarry}` : '') + (p.carrier ? ` · ${t('carrierL')}: ${p.carrier}` : '');
+}
+function eyebrowLine(){
+  const p = D.project || {};
+  return (p.name || 'Szihalom') + (p.quarry ? ` · ${p.quarry.split(' – ').pop()} → Szihalom` : '');
+}
+
 /* ---------- summary numbers ---------- */
 function stats(){
   const stone = D.records.filter(isStone), conc = D.records.filter(r => !isStone(r));
@@ -404,6 +440,7 @@ const TRUCK = '<svg viewBox="0 0 40 24" aria-hidden="true"><path fill="currentCo
 const ICON = {
   home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg>',
   days:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+  table:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M3 14.5h18M9 9v11"/></svg>',
   docs:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h7"/></svg>',
   issues:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/></svg>'};
 function setTab(tb, day){
@@ -415,11 +452,11 @@ function setTab(tb, day){
 function render(){
   document.documentElement.lang = L;
   $('#lang-hu').setAttribute('aria-pressed', L === 'hu'); $('#lang-en').setAttribute('aria-pressed', L === 'en');
-  $('#title').textContent = t('title'); $('#sub').textContent = t('sub');
+  $('#title').textContent = t('title'); $('#sub').textContent = subLine(); $('#eyebrow').textContent = eyebrowLine();
   $('#stamp').textContent = `${t('updated')}: ${D.updated}`;
   const openIss = D.issues.filter(i => i.status === 'open');
   const nav = $('#nav'); nav.hidden = false;
-  nav.innerHTML = [['home', t('home')], ['days', t('tDays')], ['docs', t('papers')], ['issues', t('tIssues')]].map(([k, l]) =>
+  nav.innerHTML = [['home', t('home')], ['days', t('tDays')], ['table', t('tTable')], ['docs', t('papers')], ['issues', t('tIssues')]].map(([k, l]) =>
     `<button type="button" data-tab="${k}" ${tab === k ? 'aria-current="page"' : ''}>${ICON[k]}<span>${l}</span>${k === 'issues' && (openOf('missing').length + openOf('check').length) ? `<span class="badge">${openOf('missing').length + openOf('check').length}</span>` : ''}</button>`).join('');
   nav.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => setTab(b.dataset.tab));
   $('#app').innerHTML = '<section id="pane"></section>';
@@ -430,6 +467,7 @@ function drawPane(){
   if (tab === 'docs') return drawDocs(p);
   if (tab === 'issues') return drawIssues(p);
   if (tab === 'days') return drawDays(p);
+  if (tab === 'table') return drawTable(p);
   drawHome(p);
 }
 
@@ -628,6 +666,225 @@ function drawDocs(p){
   p.querySelectorAll('[data-kind]').forEach(b => b.onclick = () => { docKind = b.dataset.kind; drawDocs(p); });
   $('#docDay').onchange = e => { docDay = e.target.value; drawDocs(p); };
   bindThumbs(p); lazyImgs(p);
+}
+
+/* ---------- table tab + Excel export ----------
+   One model feeds both the on-screen table and the workbook, so the columns each role sees
+   (client: no supplier paperwork, weights or drivers; office: status + missing loads) match. */
+let tblView = 'sum';
+try { const v = localStorage.getItem('szk-tview'); if (v === 'sum' || v === 'det') tblView = v; } catch (e) {}
+const ownNo = r => { for (const d of r.docs || []){ const m = d.kind === 'own' && /STL-DN-\d{4}-\d{3}/.exec(d.caption || ''); if (m) return m[0]; } return ''; };
+const fdate = d => L === 'hu' ? d.replace(/-/g, '.') + '.' : d;
+const stWord = k => t(k === 'ok' ? 'stOkW' : k === 'check' ? 'stCheckW' : 'stMissW');
+
+function tblModel(){
+  const role = D.role || 'office', client = role === 'client', office = role === 'office';
+  const hasOwn = D.records.some(r => ownNo(r)), hasConc = D.records.some(r => !isStone(r));
+  const order = stats().order;
+  const C = [
+    {k:'time', h:t('cTime'), w:7},
+    {k:'vehicle', h:t('cTruck'), w:18},
+    {k:'product', h:t('cProduct'), w:20},
+    hasOwn && {k:'own', h:t('cOwn'), w:18},
+    {k:'note', h:client ? t('cTicket') : t('cNote'), w:13},
+    !client && {k:'gross', h:t('cGross'), n:'kg', w:11},
+    !client && {k:'tare', h:t('cTare'), n:'kg', w:11},
+    {k:'t', h:t('cNet'), n:'t', sum:true, w:10},
+    {k:'m3', h:t('cM3'), n:'m3', sum:true, w:10},
+    hasConc && {k:'conc', h:t('cConc'), n:'m3', sum:true, blank0:true, w:11},
+    !client && {k:'wb', h:t('cWb'), w:11},
+    !client && {k:'driver', h:t('cDriver'), w:30},
+    office && {k:'st', h:t('cSt'), w:17},
+    !client && {k:'rmk', h:t('cRmk'), w:48, wrap:true},
+  ].filter(Boolean);
+  const S = [
+    {k:'date', h:t('cDate'), w:12},
+    {k:'wd', h:t('cDay'), w:12},
+    {k:'n', h:t('cLoads'), n:'int', sum:true, w:9},
+    {k:'t', h:t('cNet'), n:'t', sum:true, w:11},
+    {k:'m3', h:t('cM3'), n:'m3', sum:true, w:11},
+    hasConc && {k:'conc', h:t('cConc'), n:'m3', sum:true, blank0:true, w:11},
+    {k:'cumT', h:t('cCumT'), n:'t', w:13},
+    {k:'cumM3', h:t('cCumM3'), n:'m3', w:13},
+    order && {k:'pct', h:t('cPct'), n:'pct', w:11},
+    office && {k:'missTxt', h:t('cMiss'), w:22},
+  ].filter(Boolean);
+  const row = r => ({time: r.time || '', vehicle: r.vehicle || '', product: pName(r.productKey), own: ownNo(r), note: r.noteNo || '',
+    gross: r.grossKg ?? null, tare: r.tareKg ?? null, t: isStone(r) ? tonnes(r) : null, m3: isStone(r) ? m3(r) : null,
+    conc: isStone(r) ? null : (r.qty ?? null), wb: r.waybillNo || '', driver: r.driver || '', st: recState(r),
+    rmk: [r.remark, ...recIss(r).filter(i => i.status === 'open' && i.affects === 'check').map(i => i.short || i.text)].filter(Boolean).join(' · ')});
+  const missRow = x => ({time: '', vehicle: x.vehicle || '', product: pName(x.productKey), own: '', note: '', gross: null, tare: null,
+    t: null, m3: null, conc: null, wb: x.waybillNo || '', driver: '', st: 'miss', miss: true, rmk: `${t('estT', nf(x.estT, 1))}. ${x.reason || ''}`});
+  const dates = [...new Set([...D.records.map(sd), ...missing().map(x => x.date)])].sort();
+  let cumT = 0, cumM3 = 0;
+  const days = dates.map(d => {
+    const recs = D.records.filter(r => sd(r) === d).sort((a, b) => (a.time || '').localeCompare(b.time || ''));
+    const rows = recs.map(row), miss = missing().filter(x => x.date === d);
+    const sum = k => rows.reduce((a, x) => a + (x[k] || 0), 0);
+    const tn = sum('t'), vm = sum('m3');
+    cumT += tn; cumM3 += vm;
+    return {d, date: fdate(d), wd: wd(d), rows, missRows: miss.map(missRow), n: rows.length, t: tn, m3: vm, conc: sum('conc'),
+      cumT, cumM3, pct: order ? cumM3 / order.qty : null,
+      missTxt: miss.length ? `${miss.length} × ≈ ${nf(miss.reduce((a, x) => a + (x.estT || 0), 0), 1)} t` : ''};
+  });
+  return {C, S, days, order, office, client};
+}
+
+const cellV = (v, c) => c.blank0 && !v ? '' : fmtCell(v, c.n);
+const fmtCell = (v, n) => v == null || v === '' ? '' : n === 't' ? nf(v, 2) : n === 'm3' ? nf(v, 1) : n === 'kg' || n === 'int' ? nf(v) : n === 'pct' ? nf(v * 100, 1) + ' %' : esc(v);
+const XL_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M4 19h16"/></svg>';
+
+function drawTable(p){
+  const M = tblModel();
+  const th = cols => `<thead><tr>${cols.map(c => `<th class="${c.n ? 'n' : ''}">${esc(c.h)}</th>`).join('')}</tr></thead>`;
+  const tot = (cols, label, get) => cols.map((c, i) => `<td class="${c.n ? 'n' : ''}">${i === 0 ? label : c.sum ? cellV(get(c.k), c) : ''}</td>`).join('');
+  const all = k => M.days.reduce((a, x) => a + (x[k] || 0), 0);
+  let html;
+  if (tblView === 'sum'){
+    html = `<table class="dt">${th(M.S)}<tbody>${[...M.days].reverse().map(x => `<tr class="click" data-d="${x.d}">${M.S.map(c =>
+      `<td class="${c.n ? 'n' : ''}">${c.k === 'missTxt' && x.missTxt ? `<span style="color:var(--crit);font-weight:600">${esc(x.missTxt)}</span>` : cellV(x[c.k], c)}</td>`).join('')}</tr>`).join('')}</tbody>
+      <tfoot><tr class="tot">${tot(M.S, t('grand'), all)}</tr></tfoot></table>`;
+  } else {
+    const cell = (x, c) => c.k === 'st' ? `<span class="stc">${stIcon(x.st)}${esc(stWord(x.st))}</span>` : cellV(x[c.k], c);
+    html = `<table class="dt">${th(M.C)}${[...M.days].reverse().map(x => `<tbody data-d="${x.d}">
+      <tr class="dh"><td colspan="${M.C.length}">${esc(x.date)} ${esc(x.wd)}<span>${t('trips', x.n)}${x.missRows.length ? ` · ✕ ${t('nMiss', x.missRows.length)}` : ''}</span></td></tr>
+      ${[...x.rows, ...x.missRows].map(r => `<tr class="${r.miss ? 'miss' : ''}">${M.C.map(c => `<td class="${c.n ? 'n' : ''}${c.wrap ? ' rm' : ''}">${cell(r, c)}</td>`).join('')}</tr>`).join('')}
+      ${x.rows.length ? `<tr class="sub">${tot(M.C, t('daySum'), k => x[k])}</tr>` : ''}
+    </tbody>`).join('')}<tfoot><tr class="tot">${tot(M.C, t('grand'), all)}</tr></tfoot></table>`;
+  }
+  p.innerHTML = `<div class="tbar">
+      <div class="seg" role="group" aria-label="${esc(t('tTable'))}"><button type="button" data-v="sum" aria-pressed="${tblView === 'sum'}">${t('vSum')}</button><button type="button" data-v="det" aria-pressed="${tblView === 'det'}">${t('vDet')}</button></div>
+      <button type="button" class="xl" id="xl">${XL_ICON}<span>${t('xl')}</span></button>
+    </div><div class="tscroll">${html}</div>${tblView === 'sum' ? `<p class="tnote">${t('tblHint')}</p>` : ''}`;
+  p.querySelectorAll('[data-v]').forEach(b => b.onclick = () => { tblView = b.dataset.v; try { localStorage.setItem('szk-tview', tblView); } catch (e) {} drawTable(p); });
+  p.querySelectorAll('tr.click').forEach(tr => tr.onclick = () => {
+    tblView = 'det'; try { localStorage.setItem('szk-tview', tblView); } catch (e) {}
+    drawTable(p); const el = p.querySelector(`tbody[data-d="${tr.dataset.d}"]`); if (el) el.scrollIntoView({block:'start', behavior:'smooth'});
+  });
+  $('#xl').onclick = () => exportXL($('#xl'));
+}
+
+let xlLib = null;
+function loadXL(){
+  return xlLib ||= new Promise((ok, bad) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js';
+    s.integrity = 'sha512-dlPw+ytv/6JyepmelABrgeYgHI0O+frEwgfnPdXDTOIZz+eDgfW07QXG02/O8COfivBdGNINy+Vex+lYmJ5rxw==';
+    s.crossOrigin = 'anonymous'; s.referrerPolicy = 'no-referrer';
+    s.onload = () => ok(window.ExcelJS); s.onerror = () => { xlLib = null; bad(new Error('ExcelJS')); };
+    document.head.appendChild(s);
+  });
+}
+
+async function exportXL(btn){
+  const lbl = btn.querySelector('span'), old = lbl.textContent;
+  btn.disabled = true; lbl.textContent = t('xlBusy');
+  const prevErr = btn.parentNode.querySelector('.xl-err'); if (prevErr) prevErr.remove();
+  try {
+    const ExcelJS = await loadXL();
+    const M = tblModel(), P = D.project || {};
+    const NAVY = 'FF17385D', SOFT = 'FFD6E0EC', SUB = 'FFECEFEA', GREY = 'FF5B666A', CRIT = 'FFA12B22', CRITBG = 'FFF8DEDA', WARN = 'FF8A5A00', LINE = 'FFD0D6CF';
+    const NF = {t:'#,##0.00', m3:'#,##0.0', kg:'#,##0', int:'0', pct:'0.0%'};
+    const DF = L === 'hu' ? 'yyyy.mm.dd.' : 'yyyy-mm-dd';
+    const xdate = d => { const [y, m, dd] = d.split('-').map(Number); return new Date(Date.UTC(y, m - 1, dd)); };
+    const fill = argb => ({type:'pattern', pattern:'solid', fgColor:{argb}});
+    const thin = {style:'thin', color:{argb:LINE}};
+    const wb = new ExcelJS.Workbook();
+    wb.creator = P.contractor || 'Sky Tech Line Kft.'; wb.created = new Date();
+    wb.calcProperties.fullCalcOnLoad = true;
+
+    const sheet = (name, cols, top) => {
+      const ws = wb.addWorksheet(name, {views:[{state:'frozen', ySplit:top}],
+        pageSetup:{paperSize:9, orientation:'landscape', fitToPage:true, fitToWidth:1, fitToHeight:0, margins:{left:.4, right:.4, top:.5, bottom:.5, header:.3, footer:.3}},
+        // no outlineProperties: ExcelJS 4.4 then writes <pageSetUpPr> before <outlinePr> and Excel refuses
+        // the whole file. Excel's default (summary rows below the group) is what we want anyway.
+        properties:{outlineLevelRow:1}});
+      cols.forEach((c, i) => { const col = ws.getColumn(i + 1); col.width = c.w; if (c.n) col.numFmt = NF[c.n]; });
+      return ws;
+    };
+    const title = (ws, n, sub) => {
+      [[`${P.name || 'Szihalom'} – ${t('xlTitle')} · ${sub}`, {bold:true, size:14, color:{argb:NAVY}}],
+       [[P.client, P.contractor, M.order && M.order.name].filter(Boolean).join(' · '), {color:{argb:GREY}}],
+       [`${t('updated')}: ${D.updated} · ${t('exported')}: ${new Date().toLocaleString(L === 'hu' ? 'hu-HU' : 'en-GB')}`, {size:9, color:{argb:GREY}}]]
+        .forEach(([v, font], i) => { ws.mergeCells(i + 1, 1, i + 1, n); const c = ws.getCell(i + 1, 1); c.value = v; c.font = font; });
+    };
+    const head = (ws, r, cols) => {
+      const row = ws.getRow(r); row.height = 30;
+      cols.forEach((c, i) => { const x = row.getCell(i + 1); x.value = c.h; x.font = {bold:true, color:{argb:'FFFFFFFF'}}; x.fill = fill(NAVY);
+        x.alignment = {vertical:'middle', horizontal:c.n ? 'right' : 'left', wrapText:true}; });
+      ws.pageSetup.printTitlesRow = `${r}:${r}`;
+    };
+    const L1 = (ws, i) => ws.getColumn(i + 1).letter;
+    const val = (x, c) => c.k === 'date' ? xdate(x.d) : c.k === 'st' ? stWord(x.st) : (x[c.k] === '' || (c.blank0 && !x[c.k]) ? null : x[c.k]);
+
+    // 1) daily summary: one row per day, oldest first so "to date" reads downwards
+    const s1 = sheet(t('xlS1'), M.S, 5); title(s1, M.S.length, t('xlS1')); head(s1, 5, M.S);
+    let r = 6;
+    M.days.forEach((x, k) => {
+      const row = s1.getRow(r++);
+      M.S.forEach((c, i) => { const cell = row.getCell(i + 1); cell.value = val(x, c); if (c.k === 'date') cell.numFmt = DF;
+        if (c.k === 'missTxt' && x.missTxt) cell.font = {bold:true, color:{argb:CRIT}}; cell.border = {bottom:thin}; });
+      if (k % 2) row.eachCell({includeEmpty:true}, cell => cell.fill = fill('FFF6F8F5'));
+    });
+    const t1 = s1.getRow(r);
+    M.S.forEach((c, i) => { const cell = t1.getCell(i + 1);
+      cell.value = i === 0 ? t('grand') : c.sum ? {formula:`SUM(${L1(s1, i)}6:${L1(s1, i)}${r - 1})`, result:M.days.reduce((a, x) => a + (x[c.k] || 0), 0)} : null;
+      cell.font = {bold:true, color:{argb:'FFFFFFFF'}}; cell.fill = fill(NAVY); });
+    s1.autoFilter = {from:{row:5, column:1}, to:{row:r - 1, column:M.S.length}};
+
+    // 2) every load, grouped by day: band row, loads (outline level 1, collapsible), day subtotal; grand total via SUBTOTAL
+    const s2 = sheet(t('xlS2'), M.C, 5); title(s2, M.C.length, t('xlS2')); head(s2, 5, M.C);
+    r = 6;
+    M.days.forEach(x => {
+      s2.mergeCells(r, 1, r, M.C.length);
+      const band = s2.getCell(r, 1);
+      band.value = `${x.date}  ${x.wd}  ·  ${t('trips', x.n)}${x.missRows.length ? `  ·  ✕ ${t('nMiss', x.missRows.length)}` : ''}`;
+      band.font = {bold:true, color:{argb:NAVY}}; band.fill = fill(SOFT); s2.getRow(r).height = 20; r++;
+      const first = r;
+      [...x.rows, ...x.missRows].forEach(o => {
+        const row = s2.getRow(r++); row.outlineLevel = 1;
+        M.C.forEach((c, i) => { const cell = row.getCell(i + 1); cell.value = val(o, c); cell.border = {bottom:thin};
+          cell.alignment = {vertical:'top', wrapText:!!c.wrap, horizontal:c.n ? 'right' : 'left'};
+          if (o.miss){ cell.font = {color:{argb:CRIT}, bold:c.k === 'st'}; cell.fill = fill(CRITBG); }
+          else if (c.k === 'st' && o.st === 'check') cell.font = {bold:true, color:{argb:WARN}}; });
+      });
+      if (x.rows.length){
+        const row = s2.getRow(r);
+        M.C.forEach((c, i) => { const cell = row.getCell(i + 1);
+          cell.value = i === 0 ? t('daySum') : c.sum && !(c.blank0 && !x[c.k]) ? {formula:`SUBTOTAL(9,${L1(s2, i)}${first}:${L1(s2, i)}${r - 1})`, result:x[c.k]} : null;
+          cell.font = {bold:true}; cell.fill = fill(SUB); cell.border = {top:{style:'thin', color:{argb:NAVY}}}; });
+        r++;
+      }
+      r++;                                                    // blank line between days
+    });
+    const t2 = s2.getRow(r);
+    M.C.forEach((c, i) => { const cell = t2.getCell(i + 1);
+      cell.value = i === 0 ? t('grand') : c.sum ? {formula:`SUBTOTAL(9,${L1(s2, i)}6:${L1(s2, i)}${r - 1})`, result:M.days.reduce((a, x) => a + (x[c.k] || 0), 0)} : null;
+      cell.font = {bold:true, color:{argb:'FFFFFFFF'}}; cell.fill = fill(NAVY); });
+
+    // 3) flat list with a filter on every column (for sorting / pivots)
+    const C3 = [{k:'date', h:t('cDate'), w:12}, ...M.C];
+    const s3 = sheet(t('xlS3'), C3, 1); head(s3, 1, C3);
+    r = 2;
+    M.days.forEach(x => [...x.rows, ...x.missRows].forEach(o => {
+      const row = s3.getRow(r++);
+      C3.forEach((c, i) => { const cell = row.getCell(i + 1); cell.value = c.k === 'date' ? xdate(x.d) : val(o, c);
+        if (c.k === 'date') cell.numFmt = DF; if (o.miss) cell.font = {color:{argb:CRIT}}; });
+    }));
+    s3.autoFilter = {from:{row:1, column:1}, to:{row:Math.max(1, r - 1), column:C3.length}};
+
+    const buf = await wb.xlsx.writeBuffer();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([buf], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
+    a.download = `${t('xlFile')}_${(D.updated || '').slice(0, 10) || 'export'}.xlsx`;
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 4000);
+  } catch (e) {
+    console.error(e);
+    btn.insertAdjacentHTML('afterend', `<div class="xl-err">${esc(t('xlErr'))}</div>`);
+  } finally {
+    btn.disabled = false; lbl.textContent = old;
+  }
 }
 
 /* ---------- lightbox ---------- */
