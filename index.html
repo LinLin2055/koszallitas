@@ -783,6 +783,7 @@ async function exportXL(btn){
   try {
     const ExcelJS = await loadXL();
     const M = tblModel(), P = D.project || {};
+    const XC = M.C.filter(c => c.k !== 'rmk');            // the workbook leaves out the remark column
     const NAVY = 'FF17385D', SOFT = 'FFD6E0EC', SUB = 'FFECEFEA', GREY = 'FF5B666A', CRIT = 'FFA12B22', CRITBG = 'FFF8DEDA', WARN = 'FF8A5A00', LINE = 'FFD0D6CF';
     const NF = {t:'#,##0.00', m3:'#,##0.0', kg:'#,##0', int:'0', pct:'0.0%'};
     const DF = L === 'hu' ? 'yyyy.mm.dd.' : 'yyyy-mm-dd';
@@ -833,24 +834,24 @@ async function exportXL(btn){
     s1.autoFilter = {from:{row:5, column:1}, to:{row:r - 1, column:M.S.length}};
 
     // 2) every load, grouped by day: band row, loads (outline level 1, collapsible), day subtotal; grand total via SUBTOTAL
-    const s2 = sheet(t('xlS2'), M.C, 5); title(s2, M.C.length, t('xlS2')); head(s2, 5, M.C);
+    const s2 = sheet(t('xlS2'), XC, 5); title(s2, XC.length, t('xlS2')); head(s2, 5, XC);
     r = 6;
     M.days.forEach(x => {
-      s2.mergeCells(r, 1, r, M.C.length);
+      s2.mergeCells(r, 1, r, XC.length);
       const band = s2.getCell(r, 1);
       band.value = `${x.date}  ${x.wd}  ·  ${t('trips', x.n)}${x.missRows.length ? `  ·  ✕ ${t('nMiss', x.missRows.length)}` : ''}`;
       band.font = {bold:true, color:{argb:NAVY}}; band.fill = fill(SOFT); s2.getRow(r).height = 20; r++;
       const first = r;
       [...x.rows, ...x.missRows].forEach(o => {
         const row = s2.getRow(r++); row.outlineLevel = 1;
-        M.C.forEach((c, i) => { const cell = row.getCell(i + 1); cell.value = val(o, c); cell.border = {bottom:thin};
+        XC.forEach((c, i) => { const cell = row.getCell(i + 1); cell.value = val(o, c); cell.border = {bottom:thin};
           cell.alignment = {vertical:'top', wrapText:!!c.wrap, horizontal:c.n ? 'right' : 'left'};
           if (o.miss){ cell.font = {color:{argb:CRIT}, bold:c.k === 'st'}; cell.fill = fill(CRITBG); }
           else if (c.k === 'st' && o.st === 'check') cell.font = {bold:true, color:{argb:WARN}}; });
       });
       if (x.rows.length){
         const row = s2.getRow(r);
-        M.C.forEach((c, i) => { const cell = row.getCell(i + 1);
+        XC.forEach((c, i) => { const cell = row.getCell(i + 1);
           cell.value = i === 0 ? t('daySum') : c.sum && !(c.blank0 && !x[c.k]) ? {formula:`SUBTOTAL(9,${L1(s2, i)}${first}:${L1(s2, i)}${r - 1})`, result:x[c.k]} : null;
           cell.font = {bold:true}; cell.fill = fill(SUB); cell.border = {top:{style:'thin', color:{argb:NAVY}}}; });
         r++;
@@ -858,12 +859,12 @@ async function exportXL(btn){
       r++;                                                    // blank line between days
     });
     const t2 = s2.getRow(r);
-    M.C.forEach((c, i) => { const cell = t2.getCell(i + 1);
+    XC.forEach((c, i) => { const cell = t2.getCell(i + 1);
       cell.value = i === 0 ? t('grand') : c.sum ? {formula:`SUBTOTAL(9,${L1(s2, i)}6:${L1(s2, i)}${r - 1})`, result:M.days.reduce((a, x) => a + (x[c.k] || 0), 0)} : null;
       cell.font = {bold:true, color:{argb:'FFFFFFFF'}}; cell.fill = fill(NAVY); });
 
     // 3) flat list with a filter on every column (for sorting / pivots)
-    const C3 = [{k:'date', h:t('cDate'), w:12}, ...M.C];
+    const C3 = [{k:'date', h:t('cDate'), w:12}, ...XC];
     const s3 = sheet(t('xlS3'), C3, 1); head(s3, 1, C3);
     r = 2;
     M.days.forEach(x => [...x.rows, ...x.missRows].forEach(o => {
