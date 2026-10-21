@@ -26,6 +26,7 @@
   --warn:#8A5A00; --warn-bg:#FBEFD2;
   --crit:#A12B22; --crit-bg:#F8DEDA;
   --ok:#2C6B44;   --ok-bg:#DDEFE2;
+  --est:#6B3FA0;  --est-bg:#EDE4F8;   /* office-only marker colour */
   --shadow:0 1px 2px rgba(28,35,38,.06),0 4px 16px rgba(28,35,38,.06);
   --display:'Archivo','Arial Narrow',Arial,sans-serif;
   --body:'IBM Plex Sans','Segoe UI',system-ui,sans-serif;
@@ -33,11 +34,11 @@
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#111517;--surface:#192024;--sunk:#0D1012;--ink:#E4E9E6;--muted:#9AA6A9;--faint:#6F7A7D;--rule:#2C363B;
-  --accent:#8DB4DE;--accent-soft:#1F3248;--bar:#6E9CCB;--warn:#F0C66B;--warn-bg:#3A2E12;--crit:#F19C92;--crit-bg:#3E1C19;--ok:#8FD0A5;--ok-bg:#16301F;
+  --accent:#8DB4DE;--accent-soft:#1F3248;--bar:#6E9CCB;--warn:#F0C66B;--warn-bg:#3A2E12;--crit:#F19C92;--crit-bg:#3E1C19;--ok:#8FD0A5;--ok-bg:#16301F;--est:#C9A8F0;--est-bg:#2C2240;
   --shadow:0 1px 2px rgba(0,0,0,.3);color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#111517;--surface:#192024;--sunk:#0D1012;--ink:#E4E9E6;--muted:#9AA6A9;--faint:#6F7A7D;--rule:#2C363B;
-  --accent:#8DB4DE;--accent-soft:#1F3248;--bar:#6E9CCB;--warn:#F0C66B;--warn-bg:#3A2E12;--crit:#F19C92;--crit-bg:#3E1C19;--ok:#8FD0A5;--ok-bg:#16301F;
+  --accent:#8DB4DE;--accent-soft:#1F3248;--bar:#6E9CCB;--warn:#F0C66B;--warn-bg:#3A2E12;--crit:#F19C92;--crit-bg:#3E1C19;--ok:#8FD0A5;--ok-bg:#16301F;--est:#C9A8F0;--est-bg:#2C2240;
   --shadow:0 1px 2px rgba(0,0,0,.3);color-scheme:dark}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -329,6 +330,16 @@ table.dt{border-collapse:collapse;width:100%;font-size:13.5px}
 .dt tr.miss td.rm{color:var(--crit)}
 .dt .stc{display:inline-flex;align-items:center;gap:6px}
 .tnote{font-size:12.5px;color:var(--muted);margin:8px 2px 0}
+/* office-only marker: loads the site reported whose papers have not come yet (colour only, no wording) */
+.st.est{background:var(--est);color:var(--est-bg)}
+.trow.est{background:var(--est-bg);border-left:4px solid var(--est);border-radius:8px;padding-left:8px}
+.trow.est svg,.pt.est svg{color:var(--est)}
+.pt.est{background:var(--est-bg);border-color:var(--est)}
+.pill.est{background:var(--est-bg);color:var(--est)}
+.fleet .est{color:var(--est)}
+.dt tr.est td{background:var(--est-bg)}
+.dt tr.est td:first-child{box-shadow:inset 4px 0 0 var(--est)}
+.dt .estn{color:var(--est);font-weight:700}
 </style>
 </head>
 <body>
@@ -406,9 +417,10 @@ const sevClass = s => s === 'err' ? 'crit' : s === 'warn' ? 'warn' : s === 'ok' 
 const plateKey = v => (v || '').toUpperCase().replace(/[^A-Z0-9 ]/g, '').split(' ')[0];
 
 const recIss = r => D.issues.filter(i => (i.refs || []).includes(r.noteNo));
-const recState = r => recIss(r).some(i => i.status === 'open' && i.affects === 'check') ? 'check' : 'ok';
-const ST = {ok:'✓', check:'!', miss:'✕'};
-const stIcon = k => `<span class="st ${k}" title="${esc(t(k === 'ok' ? 'stOk' : k === 'check' ? 'stCheck' : 'stMiss'))}">${ST[k]}</span>`;
+const recState = r => r.est ? 'est' : recIss(r).some(i => i.status === 'open' && i.affects === 'check') ? 'check' : 'ok';
+const ST = {ok:'✓', check:'!', miss:'✕', est:'●'};
+const stIcon = k => k === 'est' ? '<span class="st est"></span>'
+  : `<span class="st ${k}" title="${esc(t(k === 'ok' ? 'stOk' : k === 'check' ? 'stCheck' : 'stMiss'))}">${ST[k]}</span>`;
 const missing = () => D.missing || [];
 const openOf = a => D.issues.filter(i => i.status === 'open' && i.affects === a);
 function whyHTML(r){
@@ -486,7 +498,7 @@ function drawHome(p){
   const lastD = S.days[S.days.length - 1], lastRecs = D.records.filter(r => sd(r) === lastD).sort((a, b) => (a.time || '').localeCompare(b.time || ''));
   const lastT = lastRecs.filter(isStone).reduce((a, r) => a + tonnes(r), 0);
   const inOrder = S.order ? S.stone.filter(r => S.order.products.includes(r.productKey)) : S.stone;
-  const nNew = inOrder.filter(r => sd(r) === lastD).length, nOn = inOrder.length - nNew;
+  const nNew = inOrder.filter(r => sd(r) === lastD).length, nEst = inOrder.filter(r => r.est && sd(r) !== lastD).length, nOn = inOrder.length - nNew - nEst;
   const isToday = lastD === new Date(Date.now() - new Date().getTimezoneOffset() * 6e4).toISOString().slice(0, 10);
   p.innerHTML = `
   <section class="hero" aria-label="${esc(t('delivered'))}">
@@ -514,15 +526,15 @@ function drawHome(p){
   <section class="panel sect">
     <h2>${t('fleetT')}<span class="hint">${t('fleetH')}</span></h2>
     <div class="fleet" role="img" aria-label="${inOrder.length} / ${inOrder.length + S.toGo}">
-      ${Array.from({length: nOn}, () => `<span class="on">${TRUCK}</span>`).join('')}${Array.from({length: nNew}, () => `<span class="new">${TRUCK}</span>`).join('')}${missing().map(() => `<span class="miss" title="${esc(t('missRow'))}">${TRUCK}</span>`).join('')}${Array.from({length: Math.max(0, S.toGo - missing().length)}, () => `<span class="off">${TRUCK}</span>`).join('')}
+      ${Array.from({length: nOn}, () => `<span class="on">${TRUCK}</span>`).join('')}${Array.from({length: nEst}, () => `<span class="est">${TRUCK}</span>`).join('')}${Array.from({length: nNew}, () => `<span class="new">${TRUCK}</span>`).join('')}${missing().map(() => `<span class="miss" title="${esc(t('missRow'))}">${TRUCK}</span>`).join('')}${Array.from({length: Math.max(0, S.toGo - missing().length)}, () => `<span class="off">${TRUCK}</span>`).join('')}
     </div>
-    <div class="legend"><span><i style="background:var(--accent)"></i>${nOn} ${t('legOn')}</span><span><i style="background:var(--warn)"></i>${nNew} ${t('legNew')} (${lastD.slice(5).replace('-', '.')}.)</span>${missing().length ? `<span><i style="background:var(--crit-bg);outline:2px dashed var(--crit)"></i>${missing().length} ${t('legMiss')}</span>` : ''}<span><i style="background:var(--rule)"></i>${Math.max(0, S.toGo - missing().length)} ${t('legOff')}</span></div>
+    <div class="legend"><span><i style="background:var(--accent)"></i>${nOn} ${t('legOn')}</span>${nEst ? `<span><i style="background:var(--est)"></i>${nEst}</span>` : ''}<span><i style="background:var(--warn)"></i>${nNew} ${t('legNew')} (${lastD.slice(5).replace('-', '.')}.)</span>${missing().length ? `<span><i style="background:var(--crit-bg);outline:2px dashed var(--crit)"></i>${missing().length} ${t('legMiss')}</span>` : ''}<span><i style="background:var(--rule)"></i>${Math.max(0, S.toGo - missing().length)} ${t('legOff')}</span></div>
   </section>
 
   <section class="panel sect">
     <div class="last-h"><h2 style="margin:0">${isToday ? t('todayW') : t('lastDay')} · ${lastD.slice(5).replace('-', '.')}. ${wd(lastD)}</h2></div>
     <div class="last-big" style="margin:8px 0 6px">${nf(lastT, 1)} t<span>${t('truckN', lastRecs.length)}</span></div>
-    ${lastRecs.map(r => `<div class="trow"><span class="tm">${esc(r.time || '')}</span>${TRUCK}<span class="pl">${esc(r.vehicle || '–')}<small>${esc(pName(r.productKey))} · ${esc(r.noteNo || '')}</small></span><span class="w">${stIcon(recState(r))}${isStone(r) ? nf(tonnes(r), 1) + ' t' : nf(r.qty, 1) + ' m³'}</span>${whyHTML(r)}</div>`).join('')}
+    ${lastRecs.map(r => `<div class="trow${r.est ? ' est' : ''}"><span class="tm">${esc(r.time || '')}</span>${TRUCK}<span class="pl">${esc(r.vehicle || '–')}<small>${esc(pName(r.productKey))}${r.noteNo ? ' · ' + esc(r.noteNo) : ''}</small></span><span class="w">${stIcon(recState(r))}${isStone(r) ? nf(tonnes(r), 1) + ' t' : nf(r.qty, 1) + ' m³'}</span>${whyHTML(r)}</div>`).join('')}
     ${missing().filter(x => x.date === lastD).map(missRowHTML).join('')}
     <button type="button" class="btn-line" id="seeDay">${t('seeDay')} →</button>
   </section>
@@ -592,23 +604,23 @@ function drawDays(p){
     const dayNotes = iss.filter(i => !(i.affects === 'check' && (i.refs || []).length) && i.affects !== 'missing' && !((i.refs || []).length && i.affects === 'info'));
     // per truck: tractor plate -> trips + amount
     const per = {};
-    recs.forEach(r => { const k = r.vehicle || '–', x = per[k] ||= {n:0, t:0, m3:0, stone:isStone(r), miss:0}; x.n++; if (isStone(r)) x.t += tonnes(r); else x.m3 += r.qty || 0; });
+    recs.forEach(r => { const k = r.vehicle || '–', x = per[k] ||= {n:0, t:0, m3:0, stone:isStone(r), miss:0, est:0}; x.n++; if (r.est) x.est++; if (isStone(r)) x.t += tonnes(r); else x.m3 += r.qty || 0; });
     miss.forEach(m => { const x = per[m.vehicle] ||= {n:0, t:0, m3:0, stone:true, miss:0}; x.miss++; });
     return `<details class="day" data-d="${d}" ${d === (openDay || latest) ? 'open' : ''}>
       <summary>
         <span class="chev" aria-hidden="true">▸</span>
         <span style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;min-width:0"><span class="day-date">${d.slice(5).replace('-', '.')}.<small>${d.slice(0, 4)} · ${wd(d)}</small></span>
           <span class="day-meta">${recs.length ? `<span class="pill">${t('truckN', recs.length)}</span>` : `<span class="pill">${t('noDel')}</span>`}
-          ${miss.length ? `<span class="pill crit">✕ ${t('nMiss', miss.length)}</span>` : ''}${nChk ? `<span class="pill warn">! ${t('nCheck', nChk)}</span>` : ''}${recs.length && !miss.length && !nChk ? `<span class="pill ok">${t('allOk')}</span>` : ''}</span></span>
+          ${miss.length ? `<span class="pill crit">✕ ${t('nMiss', miss.length)}</span>` : ''}${nChk ? `<span class="pill warn">! ${t('nCheck', nChk)}</span>` : ''}${recs.some(r => r.est) ? `<span class="pill est">● ${recs.filter(r => r.est).length}</span>` : ''}${recs.length && !miss.length && !nChk ? `<span class="pill ok">${t('allOk')}</span>` : ''}</span></span>
         <span class="day-t">${recs.length ? `<b>${st.length ? nf(tn, 1) + ' t' : nf(cm, 0) + ' m³'}</b><span>${st.length ? nf(st.reduce((a, r) => a + m3(r), 0), 1) + ' m³' : ''}${cm && st.length ? ` · ${nf(cm, 0)} m³ beton` : ''}</span>` : ''}</span>
       </summary>
       <div class="day-body">
         ${recs.length ? `
         <div><div class="sub-h">${t('perTruck')}</div><div class="per-truck">${Object.entries(per).sort((a, b) => b[1].n - a[1].n).map(([k, x]) => `
-          <div class="pt">${TRUCK}<span><b>${esc(k)}</b><small>${t('trips', x.n)}${x.miss ? ` <span style="color:var(--crit);font-weight:600">+ ${x.miss} ${t('legMiss')}</span>` : ''}</small></span><span class="w">${x.stone ? nf(x.t, 1) + ' t' : nf(x.m3, 0) + ' m³'}</span></div>`).join('')}</div></div>
+          <div class="pt${x.est ? ' est' : ''}">${TRUCK}<span><b>${esc(k)}</b><small>${t('trips', x.n)}${x.miss ? ` <span style="color:var(--crit);font-weight:600">+ ${x.miss} ${t('legMiss')}</span>` : ''}</small></span><span class="w">${x.stone ? nf(x.t, 1) + ' t' : nf(x.m3, 0) + ' m³'}</span></div>`).join('')}</div></div>
         <div><div class="sub-h">${t('dayList')}</div><div class="tlist">${recs.map(r => `
           <details class="tdet">
-            <summary class="trow"><span class="tm">${esc(r.time || '')}</span>${TRUCK}<span class="pl">${esc(r.vehicle || '–')}<small>${esc(pName(r.productKey))} · ${esc(r.noteNo || '')}</small></span><span class="w">${stIcon(recState(r))}${amount(r)}</span>${whyHTML(r)}</summary>
+            <summary class="trow${r.est ? ' est' : ''}"><span class="tm">${esc(r.time || '')}</span>${TRUCK}<span class="pl">${esc(r.vehicle || '–')}<small>${esc(pName(r.productKey))}${r.noteNo ? ' · ' + esc(r.noteNo) : ''}</small></span><span class="w">${stIcon(recState(r))}${amount(r)}</span>${whyHTML(r)}</summary>
             <div class="tdet-b">
               ${r.grossKg ? `<div>${t('gross')} <span class="mono">${nf(r.grossKg)} kg</span> − ${t('tare')} <span class="mono">${nf(r.tareKg)} kg</span> = ${t('net')} <span class="mono">${nf(r.netKg)} kg</span>${r.tareAt ? ` · ${t('tare')}: ${esc(r.tareAt)}` : ''}</div>` : ''}
               <div>${r.ekaer ? 'EKÁER <span class="mono">' + esc(r.ekaer) + '</span>' : ''}${r.driver ? ' · ' + esc(r.driver) : ''}${r.waybillNo ? ' · ' + t('waybill').toLowerCase() + ' <span class="mono">' + esc(r.waybillNo) + '</span>' : ''}</div>
@@ -684,7 +696,7 @@ let tblView = 'sum';
 try { const v = localStorage.getItem('szk-tview'); if (v === 'sum' || v === 'det') tblView = v; } catch (e) {}
 const ownNo = r => { for (const d of r.docs || []){ const m = d.kind === 'own' && /STL-DN-\d{4}-\d{3}/.exec(d.caption || ''); if (m) return m[0]; } return ''; };
 const fdate = d => L === 'hu' ? d.replace(/-/g, '.') + '.' : d;
-const stWord = k => t(k === 'ok' ? 'stOkW' : k === 'check' ? 'stCheckW' : 'stMissW');
+const stWord = k => k === 'est' ? '' : t(k === 'ok' ? 'stOkW' : k === 'check' ? 'stCheckW' : 'stMissW');
 
 function tblModel(){
   const role = D.role || 'office', client = role === 'client', office = role === 'office';
@@ -720,7 +732,7 @@ function tblModel(){
   ].filter(Boolean);
   const row = r => ({time: r.time || '', vehicle: r.vehicle || '', product: pName(r.productKey), own: ownNo(r), note: r.noteNo || '',
     gross: r.grossKg ?? null, tare: r.tareKg ?? null, t: isStone(r) ? tonnes(r) : null, m3: isStone(r) ? m3(r) : null,
-    conc: isStone(r) ? null : (r.qty ?? null), wb: r.waybillNo || '', driver: r.driver || '', st: recState(r),
+    conc: isStone(r) ? null : (r.qty ?? null), wb: r.waybillNo || '', driver: r.driver || '', st: recState(r), est: !!r.est,
     rmk: [r.remark, ...recIss(r).filter(i => i.status === 'open' && i.affects === 'check').map(i => i.short || i.text)].filter(Boolean).join(' · ')});
   const missRow = x => ({time: '', vehicle: x.vehicle || '', product: pName(x.productKey), own: '', note: '', gross: null, tare: null,
     t: null, m3: null, conc: null, wb: x.waybillNo || '', driver: '', st: 'miss', miss: true, rmk: `${t('estT', nf(x.estT, 1))}. ${x.reason || ''}`});
@@ -734,6 +746,7 @@ function tblModel(){
     cumT += tn; cumM3 += vm;
     return {d, date: fdate(d), wd: wd(d), rows, missRows: miss.map(missRow), n: rows.length, t: tn, m3: vm, conc: sum('conc'),
       cumT, cumM3, pct: order ? cumM3 / order.qty : null,
+      estN: rows.filter(x => x.est).length,
       missTxt: miss.length ? `${miss.length} × ≈ ${nf(miss.reduce((a, x) => a + (x.estT || 0), 0), 1)} t` : ''};
   });
   return {C, S, days, order, office, client};
@@ -751,13 +764,13 @@ function drawTable(p){
   let html;
   if (tblView === 'sum'){
     html = `<table class="dt">${th(M.S)}<tbody>${[...M.days].reverse().map(x => `<tr class="click" data-d="${x.d}">${M.S.map(c =>
-      `<td class="${c.n ? 'n' : ''}">${c.k === 'missTxt' && x.missTxt ? `<span style="color:var(--crit);font-weight:600">${esc(x.missTxt)}</span>` : cellV(x[c.k], c)}</td>`).join('')}</tr>`).join('')}</tbody>
+      `<td class="${c.n ? 'n' : ''}">${c.k === 'missTxt' && x.missTxt ? `<span style="color:var(--crit);font-weight:600">${esc(x.missTxt)}</span>` : c.k === 'n' && x.estN ? `<span class="estn">●</span> ${cellV(x[c.k], c)}` : cellV(x[c.k], c)}</td>`).join('')}</tr>`).join('')}</tbody>
       <tfoot><tr class="tot">${tot(M.S, t('grand'), all)}</tr></tfoot></table>`;
   } else {
     const cell = (x, c) => c.k === 'st' ? `<span class="stc">${stIcon(x.st)}${esc(stWord(x.st))}</span>` : cellV(x[c.k], c);
     html = `<table class="dt">${th(M.C)}${[...M.days].reverse().map(x => `<tbody data-d="${x.d}">
       <tr class="dh"><td colspan="${M.C.length}">${esc(x.date)} ${esc(x.wd)}<span>${t('trips', x.n)}${x.missRows.length ? ` · ✕ ${t('nMiss', x.missRows.length)}` : ''}</span></td></tr>
-      ${[...x.rows, ...x.missRows].map(r => `<tr class="${r.miss ? 'miss' : ''}">${M.C.map(c => `<td class="${c.n ? 'n' : ''}${c.wrap ? ' rm' : ''}">${cell(r, c)}</td>`).join('')}</tr>`).join('')}
+      ${[...x.rows, ...x.missRows].map(r => `<tr class="${r.miss ? 'miss' : r.est ? 'est' : ''}">${M.C.map(c => `<td class="${c.n ? 'n' : ''}${c.wrap ? ' rm' : ''}">${cell(r, c)}</td>`).join('')}</tr>`).join('')}
       ${x.rows.length ? `<tr class="sub">${tot(M.C, t('daySum'), k => x[k])}</tr>` : ''}
     </tbody>`).join('')}<tfoot><tr class="tot">${tot(M.C, t('grand'), all)}</tr></tfoot></table>`;
   }
@@ -793,7 +806,7 @@ async function exportXL(btn){
     const ExcelJS = await loadXL();
     const M = tblModel(), P = D.project || {};
     const XC = M.C.filter(c => c.k !== 'rmk');            // the workbook leaves out the remark column
-    const NAVY = 'FF17385D', SOFT = 'FFD6E0EC', SUB = 'FFECEFEA', GREY = 'FF5B666A', CRIT = 'FFA12B22', CRITBG = 'FFF8DEDA', WARN = 'FF8A5A00', LINE = 'FFD0D6CF';
+    const EST = 'FF6B3FA0', ESTBG = 'FFEDE4F8', NAVY = 'FF17385D', SOFT = 'FFD6E0EC', SUB = 'FFECEFEA', GREY = 'FF5B666A', CRIT = 'FFA12B22', CRITBG = 'FFF8DEDA', WARN = 'FF8A5A00', LINE = 'FFD0D6CF';
     const NF = {t:'#,##0.00', m3:'#,##0.0', kg:'#,##0', int:'0', pct:'0.0%'};
     const DF = L === 'hu' ? 'yyyy.mm.dd.' : 'yyyy-mm-dd';
     const xdate = d => { const [y, m, dd] = d.split('-').map(Number); return new Date(Date.UTC(y, m - 1, dd)); };
@@ -840,7 +853,8 @@ async function exportXL(btn){
     M.days.forEach((x, k) => {
       const row = s1.getRow(r++);
       M.S.forEach((c, i) => { const cell = row.getCell(i + 1); cell.value = val(x, c); if (c.k === 'date') cell.numFmt = DF;
-        if (c.k === 'missTxt' && x.missTxt) cell.font = {bold:true, color:{argb:CRIT}}; cell.border = {bottom:thin}; });
+        if (c.k === 'missTxt' && x.missTxt) cell.font = {bold:true, color:{argb:CRIT}}; cell.border = {bottom:thin};
+        if (c.k === 'n' && x.estN) cell.font = {bold:true, color:{argb:EST}}; });
       if (k % 2) row.eachCell({includeEmpty:true}, cell => cell.fill = fill('FFF6F8F5'));
     });
     const t1 = s1.getRow(r);
@@ -863,6 +877,7 @@ async function exportXL(btn){
         XC.forEach((c, i) => { const cell = row.getCell(i + 1); cell.value = val(o, c); cell.border = {bottom:thin};
           cell.alignment = {vertical:'top', wrapText:!!c.wrap, horizontal:c.n ? 'right' : 'left'};
           if (o.miss){ cell.font = {color:{argb:CRIT}, bold:c.k === 'st'}; cell.fill = fill(CRITBG); }
+          else if (o.est){ cell.font = {color:{argb:EST}}; cell.fill = fill(ESTBG); }
           else if (c.k === 'st' && o.st === 'check') cell.font = {bold:true, color:{argb:WARN}}; });
       });
       if (x.rows.length){
@@ -886,7 +901,8 @@ async function exportXL(btn){
     M.days.forEach(x => [...x.rows, ...x.missRows].forEach(o => {
       const row = s3.getRow(r++);
       C3.forEach((c, i) => { const cell = row.getCell(i + 1); cell.value = c.k === 'date' ? xdate(x.d) : val(o, c);
-        if (c.k === 'date') cell.numFmt = DF; if (o.miss) cell.font = {color:{argb:CRIT}}; });
+        if (c.k === 'date') cell.numFmt = DF; if (o.miss) cell.font = {color:{argb:CRIT}};
+        else if (o.est){ cell.font = {color:{argb:EST}}; cell.fill = fill(ESTBG); } });
     }));
     s3.autoFilter = {from:{row:1, column:1}, to:{row:Math.max(1, r - 1), column:C3.length}};
 
