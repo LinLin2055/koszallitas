@@ -355,7 +355,7 @@ table.dt{border-collapse:collapse;width:100%;font-size:13.5px}
       </div>
     </div>
     <div class="top-r">
-      <span class="stamp" id="stamp"></span>
+      <span class="stamp" id="stamp" hidden></span>
       <div class="seg" role="group" aria-label="Nyelv / Language">
         <button type="button" id="lang-hu" aria-pressed="true">HU</button>
         <button type="button" id="lang-en" aria-pressed="false">EN</button>
@@ -474,7 +474,7 @@ function render(){
   document.documentElement.lang = L;
   $('#lang-hu').setAttribute('aria-pressed', L === 'hu'); $('#lang-en').setAttribute('aria-pressed', L === 'en');
   $('#title').textContent = t('title'); $('#sub').textContent = subLine(); $('#eyebrow').textContent = eyebrowLine();
-  $('#stamp').textContent = `${t('updated')}: ${D.updated}`;
+  $('#stamp').textContent = `${t('updated')}: ${D.updated}`; $('#stamp').hidden = false;
   const openIss = D.issues.filter(i => i.status === 'open');
   const nav = $('#nav'); nav.hidden = false;
   nav.innerHTML = [['home', t('home')], ['days', t('tDays')], ['table', t('tTable')], ['docs', t('papers')], ['issues', t('tIssues')]].map(([k, l]) =>
@@ -944,7 +944,13 @@ $('#lb').addEventListener('click', e => { if (e.target.id === 'lb-stage') closeL
 document.addEventListener('keydown', e => { if ($('#lb').hidden) return;
   if (e.key === 'Escape') closeLB(); if (e.key === 'ArrowLeft') $('#lb-prev').click(); if (e.key === 'ArrowRight') $('#lb-next').click(); });
 
-function setLang(l){ L = l; try { localStorage.setItem('szk-lang', l); } catch (e) {} $('#logout-t').textContent = t('logout'); if (D) render(); else if ($('#gate')){ $('#gate h2').textContent = t('gateT'); $('#gate p').textContent = t('gateP'); $('#gate button').textContent = t('gateBtn'); } }
+/* header language state, also before login (title, HU/EN highlight, page lang) */
+function langChrome(){
+  document.documentElement.lang = L;
+  $('#lang-hu').setAttribute('aria-pressed', L === 'hu'); $('#lang-en').setAttribute('aria-pressed', L === 'en');
+  $('#title').textContent = t('title'); $('#logout-t').textContent = t('logout');
+}
+function setLang(l){ L = l; try { localStorage.setItem('szk-lang', l); } catch (e) {} langChrome(); if (D) render(); else if ($('#gate')){ $('#gate h2').textContent = t('gateT'); $('#gate p').textContent = t('gateP'); $('#gate button').textContent = t('gateBtn'); } }
 $('#lang-hu').onclick = () => setLang('hu'); $('#lang-en').onclick = () => setLang('en');
 
 /* ---------- access code + decryption (PBKDF2-SHA256 -> AES-GCM-256; every file is IV(12) + ciphertext) ---------- */
@@ -979,6 +985,7 @@ function gate(msg){
   });
 }
 async function start(){
+  langChrome();
   if (ENC && !(window.crypto && crypto.subtle)){ $('#app').innerHTML = `<div class="skeleton">${t('noCrypto')}</div>`; return; }
   let code = null; try { code = localStorage.getItem(LS_CODE); } catch (e) {}
   if (ENC && !code) code = await gate();
